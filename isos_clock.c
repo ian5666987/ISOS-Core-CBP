@@ -36,11 +36,11 @@
 #include <string.h>
 #include "isos_clock.h"
 
-struct IsosClock IsosClock_Create(short day, long ms){
-    struct IsosClock clock;
-    clock.Day = day;
-    clock.Ms = ms;
-    return clock;
+IsosClock IsosClock_Create(short day, long ms){
+  IsosClock clock;
+  clock.Day = day;
+  clock.Ms = ms;
+  return clock;
 }
 
 //if both are positive, then it is ok
@@ -48,43 +48,43 @@ struct IsosClock IsosClock_Create(short day, long ms){
 //if day is positive and ms is negative, it is ok
 //if day is negative and ms is positive, then try to make the ms negative instead
 //assumes the data is at most 1 day difference, no overflow
-void IsosClock_Adjust(struct IsosClock *clock){
-    while (clock->Ms >= MS_PER_DAY){ //too big for ms
-        clock->Ms -= MS_PER_DAY; //minus the ms per day
-        clock->Day++; //adds the day
-    }
-    //adjust only once
-    if (clock->Day > 0 && clock->Ms < 0){
-        clock->Day--;
-        clock->Ms += MS_PER_DAY;
-    } else if (clock->Day < 0 && clock->Ms > 0){
-        clock->Day++;
-        clock->Ms -= MS_PER_DAY;
-    }
+void IsosClock_Adjust(IsosClock *clock){
+  while (clock->Ms >= MS_PER_DAY){ //too big for ms
+    clock->Ms -= MS_PER_DAY; //minus the ms per day
+    clock->Day++; //adds the day
+  }
+  //adjust only once
+  if (clock->Day > 0 && clock->Ms < 0){
+    clock->Day--;
+    clock->Ms += MS_PER_DAY;
+  } else if (clock->Day < 0 && clock->Ms > 0){
+    clock->Day++;
+    clock->Ms -= MS_PER_DAY;
+  }
 }
 
 //Ideally, add clock is always positive
-struct IsosClock IsosClock_Add(struct IsosClock* clock, struct IsosClock* addClock){
-    struct IsosClock resultClock;
-    resultClock = IsosClock_Create(clock->Day + addClock->Day, clock->Ms + addClock->Ms);
-    IsosClock_Adjust(&resultClock);
-    return resultClock;
+IsosClock IsosClock_Add(IsosClock* clock, IsosClock* addClock){
+  IsosClock resultClock;
+  resultClock = IsosClock_Create(clock->Day + addClock->Day, clock->Ms + addClock->Ms);
+  IsosClock_Adjust(&resultClock);
+  return resultClock;
 }
 
-struct IsosClock IsosClock_Minus(struct IsosClock *clock, struct IsosClock *minusClock){
-    struct IsosClock resultClock;
-    resultClock = IsosClock_Create(clock->Day - minusClock->Day, clock->Ms - minusClock->Ms);
-    IsosClock_Adjust(&resultClock);
-    return resultClock;
+IsosClock IsosClock_Minus(IsosClock *clock, IsosClock *minusClock){
+  IsosClock resultClock;
+  resultClock = IsosClock_Create(clock->Day - minusClock->Day, clock->Ms - minusClock->Ms);
+  IsosClock_Adjust(&resultClock);
+  return resultClock;
 }
 
 //The input is an adjusted clock
-char IsosClock_GetDirection(struct IsosClock *adjustedClock){
-    if(adjustedClock->Day == 0 && adjustedClock->Ms == 0)
-        return 0; //this is neutral clock direction
-    if(adjustedClock->Day > 0)
-        return 1; //always positive
-    else if(adjustedClock->Day == 0)
-        return adjustedClock->Ms > 0 ? 1 : -1; //the case for 0 would have been taken cared of
-    return -1; //otherwise it is always negative result
+char IsosClock_GetDirection(IsosClock *adjustedClock){
+  if(adjustedClock->Day == 0 && adjustedClock->Ms == 0)
+    return 0; //this is neutral clock direction
+  if(adjustedClock->Day > 0)
+    return 1; //always positive
+  else if(adjustedClock->Day == 0)
+    return adjustedClock->Ms > 0 ? 1 : -1; //the case for 0 would have been taken cared of
+  return -1; //otherwise it is always negative result
 }

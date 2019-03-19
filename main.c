@@ -40,215 +40,213 @@
 #include "main.h"
 #include "isos_debug_basic.h"
 
-int main()
-{
-    struct IsosClock mainClock;
-    char val;
-    Isos_Init(); //the first to be called before registering any task
-    registerTasks();
+int main() {
+  IsosClock mainClock;
+  char val;
+  Isos_Init(); //the first to be called before registering any task
+  registerTasks();
 
-    while (1){ //While (1) to be used internally in the Isos_Run() function for actual implementation, see TODO note on Isos_Run() function
-        mainClock = Isos_GetClock();
-        if (mainClock.Ms > 0 && mainClock.Ms % 2000 == 0){
-            printf("Press any key but [x+Enter] to continue...\n");
-            scanf(" %c", &val);
-            if (val == 'x')
-                break;
-        }
-        Isos_Run();
-        Isos_Tick(); //to simulate the ticking from the interrupt, to be called in the interrupt per ms in the actual implementation
+  while (1){ //While (1) to be used internally in the Isos_Run() function for actual implementation, see TODO note on Isos_Run() function
+    mainClock = Isos_GetClock();
+    if (mainClock.Ms > 0 && mainClock.Ms % 2000 == 0){
+      printf("Press any key but [x+Enter] to continue...\n");
+      scanf(" %c", &val);
+      if (val == 'x')
+        break;
     }
+    Isos_Run();
+    Isos_Tick(); //to simulate the ticking from the interrupt, to be called in the interrupt per ms in the actual implementation
+  }
 
-    return 0;
-
+  return 0;
 }
 
 void registerTasks(){
-    Isos_RegisterRunOnceTask(1, 0, 1200, MAX_PRIORITY-2, RunOnceTask1); //suppose this is antenna deployment
-    Isos_RegisterRunOnceTask(1, 0, 1800, MAX_PRIORITY-3, RunOnceTask2); //suppose this is solar panel deployment
-    Isos_RegisterRunOnceTask(1, 0, 370, 3, RunOnceTask3); //purposely made to simulate interesting clash on 370ms time stamp
-    Isos_RegisterLooselyRepeatedTask(1, 0, 100, 0, LooselyRepeatedTask1);
-    Isos_RegisterLooselyRepeatedTask(1, 0, 150, 1, LooselyRepeatedTask2);
-    Isos_RegisterLooselyRepeatedTask(1, 0, 400, 2, LooselyRepeatedTask3); //Added to test task waiting case
-    Isos_RegisterRepeatedTask(1, 0, 200, 4, RepeatedTask1);
-    Isos_RegisterRepeatedTask(1, 0, 300, 5, RepeatedTask2);
-    Isos_RegisterPeriodicTask(1, 0, 200, 6, PeriodicTask1);
-    Isos_RegisterPeriodicTask(1, 0, 250, 7, PeriodicTask2);
-    Isos_RegisterPeriodicTask(1, 0, 300, 8, PeriodicTask3);
-    Isos_RegisterPeriodicTask(1, 0, 350, 9, PeriodicTask4);
+  Isos_RegisterRunOnceTask(1, 0, 1200, MAX_PRIORITY-2, RunOnceTask1); //suppose this is antenna deployment
+  Isos_RegisterRunOnceTask(1, 0, 1800, MAX_PRIORITY-3, RunOnceTask2); //suppose this is solar panel deployment
+  Isos_RegisterRunOnceTask(1, 0, 370, 3, RunOnceTask3); //purposely made to simulate interesting clash on 370ms time stamp
+  Isos_RegisterLooselyRepeatedTask(1, 0, 100, 0, LooselyRepeatedTask1);
+  Isos_RegisterLooselyRepeatedTask(1, 0, 150, 1, LooselyRepeatedTask2);
+  Isos_RegisterLooselyRepeatedTask(1, 0, 400, 2, LooselyRepeatedTask3); //Added to test task waiting case
+  Isos_RegisterRepeatedTask(1, 0, 200, 4, RepeatedTask1);
+  Isos_RegisterRepeatedTask(1, 0, 300, 5, RepeatedTask2);
+  Isos_RegisterPeriodicTask(1, 0, 200, 6, PeriodicTask1);
+  Isos_RegisterPeriodicTask(1, 0, 250, 7, PeriodicTask2);
+  Isos_RegisterPeriodicTask(1, 0, 300, 8, PeriodicTask3);
+  Isos_RegisterPeriodicTask(1, 0, 350, 9, PeriodicTask4);
 
-    //Better put all resource task priorities higher than all other tasks
-    Isos_RegisterResourceTask(IsosResourceTaskType_Type1, MAX_PRIORITY-1, ResourceTask1);
-    Isos_RegisterResourceTask(IsosResourceTaskType_Type2, MAX_PRIORITY, ResourceTask2);
+  //Better put all resource task priorities higher than all other tasks
+  Isos_RegisterResourceTask(IsosResourceTaskType_Type1, MAX_PRIORITY-1, ResourceTask1);
+  Isos_RegisterResourceTask(IsosResourceTaskType_Type2, MAX_PRIORITY, ResourceTask2);
 }
 
-void simulateCommonTask(struct IsosTaskActionInfo* taskActionInfo, int endSubtaskNo, enum IsosTaskState endState){
-    if (taskActionInfo->Subtask == endSubtaskNo)
-        taskActionInfo->State = endState;
-    else
-        taskActionInfo->Subtask++;
+void simulateCommonTask(IsosTaskActionInfo* taskActionInfo, int endSubtaskNo, IsosTaskState endState){
+  if (taskActionInfo->Subtask == endSubtaskNo)
+    taskActionInfo->State = endState;
+  else
+    taskActionInfo->Subtask++;
 }
 
-void simulateCommonTaskWithSuspension(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo, int endSubtaskNo, enum IsosTaskState endState,
+void simulateCommonTaskWithSuspension(unsigned char taskId, IsosTaskActionInfo* taskActionInfo, int endSubtaskNo, IsosTaskState endState,
                                       int waitingSubtaskNo, short waitingDay, long waitingMs){
-    if (taskActionInfo->Subtask == endSubtaskNo)
-        taskActionInfo->State = endState;
-    else if(taskActionInfo->Subtask == waitingSubtaskNo){
-        Isos_Wait(taskId, waitingDay, waitingMs);
-        taskActionInfo->Subtask++;
-    } else
-        taskActionInfo->Subtask++;
+  if (taskActionInfo->Subtask == endSubtaskNo)
+    taskActionInfo->State = endState;
+  else if(taskActionInfo->Subtask == waitingSubtaskNo){
+    Isos_Wait(taskId, waitingDay, waitingMs);
+    taskActionInfo->Subtask++;
+  } else
+    taskActionInfo->Subtask++;
 }
 
-void simulateCommonTaskWithErrorRate(struct IsosTaskActionInfo* taskActionInfo, int endSubtaskNo, int errorMultiplierValue){
-    static int runningValue = 0;
-    if (taskActionInfo->Subtask == endSubtaskNo) {
-        runningValue++;
-        taskActionInfo->State = runningValue % errorMultiplierValue == 0 ? //error every multiply of errorMultiplierValue
-            IsosTaskState_Failed : IsosTaskState_Success;
-    } else
-        taskActionInfo->Subtask++;
+void simulateCommonTaskWithErrorRate(IsosTaskActionInfo* taskActionInfo, int endSubtaskNo, int errorMultiplierValue){
+  static int runningValue = 0;
+  if (taskActionInfo->Subtask == endSubtaskNo) {
+      runningValue++;
+    taskActionInfo->State = runningValue % errorMultiplierValue == 0 ? //error every multiply of errorMultiplierValue
+        IsosTaskState_Failed : IsosTaskState_Success;
+  } else
+    taskActionInfo->Subtask++;
 }
 
-void simulateCommonTaskWithResourceUsage(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo, enum IsosResourceTaskType type){
-    char result = 0;
-    enum IsosTaskState taskState = IsosTaskState_Undefined;
-    //static int timeoutTrials; //may not be necessary
-    switch(taskActionInfo->Subtask){
-    case 0:
-        result = Isos_ClaimResourceTask(taskId, type);
-        if (result)
-            taskActionInfo->Subtask++;
-        break;
-    case 1:
-        taskState = Isos_GetResourceTaskState(type);
-        if (taskState == IsosTaskState_Success){
-            Isos_ReleaseResourceTask(type, taskActionInfo);
-            taskActionInfo->Subtask = 2; //go to substate 2
-            IsosDebugBasic_PrintSubtaskNote(1, 2);
-        } else if (taskState == IsosTaskState_Failed) {
-            Isos_ReleaseResourceTask(type, taskActionInfo);
-            taskActionInfo->Subtask = 3; //go to substate 3
-            IsosDebugBasic_PrintSubtaskNote(-1, 3);
-        } else {
-            IsosDebugBasic_PrintSubtaskNote(0, 1);
-        }
-        break;
-    case 2: //successful case, do something
-        taskActionInfo->State = IsosTaskState_Success;
-        break;
-    case 3: //failed case, do something else
-        taskActionInfo->State = IsosTaskState_Failed;
-        break;
+void simulateCommonTaskWithResourceUsage(unsigned char taskId, IsosTaskActionInfo* taskActionInfo, IsosResourceTaskType type){
+  char result = 0;
+  IsosTaskState taskState = IsosTaskState_Undefined;
+  //static int timeoutTrials; //may not be necessary
+  switch(taskActionInfo->Subtask){
+  case 0:
+    result = Isos_ClaimResourceTask(taskId, type);
+    if (result)
+        taskActionInfo->Subtask++;
+    break;
+  case 1:
+    taskState = Isos_GetResourceTaskState(type);
+    if (taskState == IsosTaskState_Success){
+        Isos_ReleaseResourceTask(type, taskActionInfo);
+        taskActionInfo->Subtask = 2; //go to substate 2
+        IsosDebugBasic_PrintSubtaskNote(1, 2);
+    } else if (taskState == IsosTaskState_Failed) {
+        Isos_ReleaseResourceTask(type, taskActionInfo);
+        taskActionInfo->Subtask = 3; //go to substate 3
+        IsosDebugBasic_PrintSubtaskNote(-1, 3);
+    } else {
+        IsosDebugBasic_PrintSubtaskNote(0, 1);
     }
+    break;
+  case 2: //successful case, do something
+    taskActionInfo->State = IsosTaskState_Success;
+    break;
+  case 3: //failed case, do something else
+    taskActionInfo->State = IsosTaskState_Failed;
+    break;
+  }
 }
 
-void simulateCommonTaskWithMultiResourcesUsage(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo, enum IsosResourceTaskType type1, enum IsosResourceTaskType type2){
-    char result = 0;
-    enum IsosTaskState taskState = IsosTaskState_Undefined;
-    //static int timeoutTrials; //may not be necessary
-    switch(taskActionInfo->Subtask){
-    case 0:
-        result = Isos_ClaimResourceTask(taskId, type1);
-        if (result)
-            taskActionInfo->Subtask++;
-        break;
-    case 1:
-        taskState = Isos_GetResourceTaskState(type1);
-        if (taskState == IsosTaskState_Success){
-            Isos_ReleaseResourceTask(type1, taskActionInfo);
-            taskActionInfo->Subtask++; //go to next substate
-            IsosDebugBasic_PrintSubtaskNote(1, 2);
-        } else if (taskState == IsosTaskState_Failed) {
-            Isos_ReleaseResourceTask(type1, taskActionInfo);
-            taskActionInfo->Subtask = 5; //go to substate 5
-            IsosDebugBasic_PrintSubtaskNote(-1, 5);
-        } else {
-            IsosDebugBasic_PrintSubtaskNote(0, 1);
-        }
-        break;
-    case 2: //successful case first stage, do something
-        result = Isos_ClaimResourceTask(taskId, type2);
-        if (result)
-            taskActionInfo->Subtask++;
-        break;
-    case 3:
-        taskState = Isos_GetResourceTaskState(type2);
-        if (taskState == IsosTaskState_Success){
-            Isos_ReleaseResourceTask(type2, taskActionInfo);
-            taskActionInfo->Subtask++; //go to next substate
-            IsosDebugBasic_PrintSubtaskNote(1, 4);
-        } else if (taskState == IsosTaskState_Failed) {
-            Isos_ReleaseResourceTask(type2, taskActionInfo);
-            taskActionInfo->Subtask = 5; //go to substate 5
-            IsosDebugBasic_PrintSubtaskNote(-1, 5);
-        } else {
-            IsosDebugBasic_PrintSubtaskNote(0, 3);
-        }
-        break;
-    case 4: //successful case, do something
-        taskActionInfo->State = IsosTaskState_Success;
-        break;
-    case 5: //failed case, do something else
-        taskActionInfo->State = IsosTaskState_Failed;
-        break;
+void simulateCommonTaskWithMultiResourcesUsage(unsigned char taskId, IsosTaskActionInfo* taskActionInfo, IsosResourceTaskType type1, IsosResourceTaskType type2){
+  char result = 0;
+  IsosTaskState taskState = IsosTaskState_Undefined;
+  //static int timeoutTrials; //may not be necessary
+  switch(taskActionInfo->Subtask){
+  case 0:
+    result = Isos_ClaimResourceTask(taskId, type1);
+    if (result)
+        taskActionInfo->Subtask++;
+    break;
+  case 1:
+    taskState = Isos_GetResourceTaskState(type1);
+    if (taskState == IsosTaskState_Success){
+        Isos_ReleaseResourceTask(type1, taskActionInfo);
+        taskActionInfo->Subtask++; //go to next substate
+        IsosDebugBasic_PrintSubtaskNote(1, 2);
+    } else if (taskState == IsosTaskState_Failed) {
+        Isos_ReleaseResourceTask(type1, taskActionInfo);
+        taskActionInfo->Subtask = 5; //go to substate 5
+        IsosDebugBasic_PrintSubtaskNote(-1, 5);
+    } else {
+        IsosDebugBasic_PrintSubtaskNote(0, 1);
     }
+    break;
+  case 2: //successful case first stage, do something
+    result = Isos_ClaimResourceTask(taskId, type2);
+    if (result)
+        taskActionInfo->Subtask++;
+    break;
+  case 3:
+    taskState = Isos_GetResourceTaskState(type2);
+    if (taskState == IsosTaskState_Success){
+        Isos_ReleaseResourceTask(type2, taskActionInfo);
+        taskActionInfo->Subtask++; //go to next substate
+        IsosDebugBasic_PrintSubtaskNote(1, 4);
+    } else if (taskState == IsosTaskState_Failed) {
+        Isos_ReleaseResourceTask(type2, taskActionInfo);
+        taskActionInfo->Subtask = 5; //go to substate 5
+        IsosDebugBasic_PrintSubtaskNote(-1, 5);
+    } else {
+        IsosDebugBasic_PrintSubtaskNote(0, 3);
+    }
+    break;
+  case 4: //successful case, do something
+    taskActionInfo->State = IsosTaskState_Success;
+    break;
+  case 5: //failed case, do something else
+    taskActionInfo->State = IsosTaskState_Failed;
+    break;
+  }
 }
 
-void RunOnceTask1(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1);
+void RunOnceTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1);
 }
 
-void RunOnceTask2(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithMultiResourcesUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1, IsosResourceTaskType_Type2);
+void RunOnceTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithMultiResourcesUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1, IsosResourceTaskType_Type2);
 }
 
-void RunOnceTask3(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type2);
+void RunOnceTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type2);
 }
 
-void LooselyRepeatedTask1(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type2);
+void LooselyRepeatedTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type2);
 }
 
-void LooselyRepeatedTask2(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1);
+void LooselyRepeatedTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1);
 }
 
-void LooselyRepeatedTask3(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithSuspension(taskId, taskActionInfo, 3, IsosTaskState_Success, 1, 0, 50);
+void LooselyRepeatedTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithSuspension(taskId, taskActionInfo, 3, IsosTaskState_Success, 1, 0, 50);
 }
 
-void RepeatedTask1(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTask(taskActionInfo, 5, IsosTaskState_Success);
+void RepeatedTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTask(taskActionInfo, 5, IsosTaskState_Success);
 }
 
-void RepeatedTask2(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTask(taskActionInfo, 4, IsosTaskState_Failed);
+void RepeatedTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTask(taskActionInfo, 4, IsosTaskState_Failed);
 }
 
-void PeriodicTask1(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1);
+void PeriodicTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1);
 }
 
-void PeriodicTask2(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type2);
+void PeriodicTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type2);
 }
 
-void PeriodicTask3(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithMultiResourcesUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1, IsosResourceTaskType_Type2);
+void PeriodicTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithMultiResourcesUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1, IsosResourceTaskType_Type2);
 }
 
-void PeriodicTask4(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithMultiResourcesUsage(taskId, taskActionInfo, IsosResourceTaskType_Type2, IsosResourceTaskType_Type1);
+void PeriodicTask4(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithMultiResourcesUsage(taskId, taskActionInfo, IsosResourceTaskType_Type2, IsosResourceTaskType_Type1);
 }
 
-void ResourceTask1(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTask(taskActionInfo, 3, IsosTaskState_Success);
+void ResourceTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTask(taskActionInfo, 3, IsosTaskState_Success);
 }
 
-void ResourceTask2(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo){
-    simulateCommonTaskWithErrorRate(taskActionInfo, 3, 3);
+void ResourceTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+  simulateCommonTaskWithErrorRate(taskActionInfo, 3, 3);
 }
 
 

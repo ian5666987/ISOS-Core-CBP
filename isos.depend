@@ -1,52 +1,52 @@
 # depslib dependency file v1.0
-1552128534 source:c:\astrio\c\isos\isos\main.c
+1552980864 source:c:\astrio\c\isos\isos\main.c
 	<stdio.h>
 	<stdlib.h>
 	"main.h"
 	"isos_debug_basic.h"
 
-1552128868 source:c:\astrio\c\isos\isos\isos_task.c
+1552981116 source:c:\astrio\c\isos\isos\isos_task.c
 	<stdio.h>
 	<string.h>
 	"isos_task.h"
 
-1552129326 c:\astrio\c\isos\isos\isos_task.h
+1552985719 c:\astrio\c\isos\isos\isos_task.h
 	"isos_clock.h"
 
-1552128884 source:c:\astrio\c\isos\isos\isos.c
+1552980749 source:c:\astrio\c\isos\isos\isos.c
 	<stdio.h>
 	<string.h>
 	"isos.h"
 	"isos_quicksort.h"
 	"isos_debug_basic.h"
 
-1552129707 c:\astrio\c\isos\isos\isos.h
+1552985742 c:\astrio\c\isos\isos\isos.h
 	"isos_task.h"
 
-1552128688 source:c:\astrio\c\isos\isos\isos_clock.c
+1552980998 source:c:\astrio\c\isos\isos\isos_clock.c
 	<stdio.h>
 	<string.h>
 	"isos_clock.h"
 
-1552129222 c:\astrio\c\isos\isos\isos_clock.h
+1552980890 c:\astrio\c\isos\isos\isos_clock.h
 
-1552128527 c:\astrio\c\isos\isos\main.h
+1552979533 c:\astrio\c\isos\isos\main.h
 	"isos.h"
 
 1551774792 source:c:\astrio\c\isos\isos\extra_quicksort.c
 	<stdio.h>
 
-1552128727 source:c:\astrio\c\isos\isos\isos_quicksort.c
+1552981093 source:c:\astrio\c\isos\isos\isos_quicksort.c
 	<stdio.h>
 	"isos.h"
 
-1552128732 c:\astrio\c\isos\isos\isos_quicksort.h
+1552979385 c:\astrio\c\isos\isos\isos_quicksort.h
 
-1552128781 source:c:\astrio\c\isos\isos\isos_debug_basic.c
+1552980969 source:c:\astrio\c\isos\isos\isos_debug_basic.c
 	<string.h>
 	<stdio.h>
 	"isos_debug_basic.h"
 
-1552128808 c:\astrio\c\isos\isos\isos_debug_basic.h
+1552979347 c:\astrio\c\isos\isos\isos_debug_basic.h
 	"isos.h"
 

@@ -39,148 +39,148 @@
 #define PRINT_SUBTASK_EVENT 1
 #define PRINT_DUE_TASK_HEADER 1
 
-char* IsosDebugBasic_TaskTypeToString(enum IsosTaskType type){
-    switch(type){
-        case IsosTaskType_RunOnce: return "NC-RO";
-        case IsosTaskType_Resource: return "NC-RS";
-        case IsosTaskType_LooselyRepeated: return "CY-LR";
-        case IsosTaskType_Repeated: return "CY-RE";
-        case IsosTaskType_Periodic: return "CY-PR";
-    }
-    return "UNKNOWN";
+char* IsosDebugBasic_TaskTypeToString(IsosTaskType type){
+  switch(type){
+    case IsosTaskType_RunOnce: return "NC-RO";
+    case IsosTaskType_Resource: return "NC-RS";
+    case IsosTaskType_LooselyRepeated: return "CY-LR";
+    case IsosTaskType_Repeated: return "CY-RE";
+    case IsosTaskType_Periodic: return "CY-PR";
+  }
+  return "UNKNOWN";
 }
 
-char* IsosDebugBasic_ResourceTypeToString(enum IsosResourceTaskType type){
-    switch(type){
-        case IsosResourceTaskType_Type1: return "Type 1";
-        case IsosResourceTaskType_Type2: return "Type 2";
-        case IsosResourceTaskType_Type3: return "Type 3";
-        case IsosResourceTaskType_Type4: return "Type 4";
-        case IsosResourceTaskType_Type5: return "Type 5";
-        case IsosResourceTaskType_Type6: return "Type 6";
-        case IsosResourceTaskType_Type7: return "Type 7";
-        case IsosResourceTaskType_Type8: return "Type 8";
-        case IsosResourceTaskType_Unspecified:
-        default: return "Unspecified";
-    }
+char* IsosDebugBasic_ResourceTypeToString(IsosResourceTaskType type){
+  switch(type){
+    case IsosResourceTaskType_Type1: return "Type 1";
+    case IsosResourceTaskType_Type2: return "Type 2";
+    case IsosResourceTaskType_Type3: return "Type 3";
+    case IsosResourceTaskType_Type4: return "Type 4";
+    case IsosResourceTaskType_Type5: return "Type 5";
+    case IsosResourceTaskType_Type6: return "Type 6";
+    case IsosResourceTaskType_Type7: return "Type 7";
+    case IsosResourceTaskType_Type8: return "Type 8";
+    case IsosResourceTaskType_Unspecified:
+    default: return "Unspecified";
+  }
 }
 
-char* IsosDebugBasic_TaskStateToString(enum IsosTaskState state){
-    switch(state){
-        case IsosTaskState_Failed: return "Failed";
-        case IsosTaskState_Initial: return "Started";
-        case IsosTaskState_Running: return "Running";
-        case IsosTaskState_Success: return "Completed Successfully";
-        case IsosTaskState_Suspended: return "Suspended";
-        case IsosTaskState_Undefined:
-        default: return "in Unknown state";
-    }
+char* IsosDebugBasic_TaskStateToString(IsosTaskState state){
+  switch(state){
+    case IsosTaskState_Failed: return "Failed";
+    case IsosTaskState_Initial: return "Started";
+    case IsosTaskState_Running: return "Running";
+    case IsosTaskState_Success: return "Completed Successfully";
+    case IsosTaskState_Suspended: return "Suspended";
+    case IsosTaskState_Undefined:
+    default: return "in Unknown state";
+  }
 }
 
 void IsosDebugBasic_PrintFrontBlank(){ printf("              "); }
 
-void IsosDebugBasic_PrintResourceClaiming(enum IsosResourceTaskType type, char result, unsigned char id){
-    if (PRINT_RESOURCE_EVENT){
-        IsosDebugBasic_PrintFrontBlank();
-        printf("Claiming resource [%s] [Task Id: %02d]: ", IsosDebugBasic_ResourceTypeToString(type), id);
-        printf(result ? "Successful\n" : "Failed\n");
-    }
+void IsosDebugBasic_PrintResourceClaiming(IsosResourceTaskType type, char result, unsigned char id){
+  if (PRINT_RESOURCE_EVENT){
+    IsosDebugBasic_PrintFrontBlank();
+    printf("Claiming resource [%s] [Task Id: %02d]: ", IsosDebugBasic_ResourceTypeToString(type), id);
+    printf(result ? "Successful\n" : "Failed\n");
+  }
 }
 
-void IsosDebugBasic_PrintResourceChecking(enum IsosResourceTaskType type, enum IsosTaskState state, unsigned char id){
-    if (PRINT_RESOURCE_EVENT){
-        IsosDebugBasic_PrintFrontBlank();
-        printf("Checking resource [%s] [Task Id: %02d]: %s\n", IsosDebugBasic_ResourceTypeToString(type), id, IsosDebugBasic_TaskStateToString(state));
-    }
+void IsosDebugBasic_PrintResourceChecking(IsosResourceTaskType type, IsosTaskState state, unsigned char id){
+  if (PRINT_RESOURCE_EVENT){
+    IsosDebugBasic_PrintFrontBlank();
+    printf("Checking resource [%s] [Task Id: %02d]: %s\n", IsosDebugBasic_ResourceTypeToString(type), id, IsosDebugBasic_TaskStateToString(state));
+  }
 }
 
-void IsosDebugBasic_PrintResourceReleasing(enum IsosResourceTaskType type, unsigned char id){
-    if (PRINT_RESOURCE_EVENT){
-        IsosDebugBasic_PrintFrontBlank();
-        printf("Releasing resource [%s] [Task Id: %02d]...\n", IsosDebugBasic_ResourceTypeToString(type), id);
-    }
+void IsosDebugBasic_PrintResourceReleasing(IsosResourceTaskType type, unsigned char id){
+  if (PRINT_RESOURCE_EVENT){
+    IsosDebugBasic_PrintFrontBlank();
+    printf("Releasing resource [%s] [Task Id: %02d]...\n", IsosDebugBasic_ResourceTypeToString(type), id);
+  }
 }
 
-void IsosDebugBasic_GetPrintClock(struct IsosClock clock, char* results){
-    short dayPart = clock.Day;
-    long mMsPart = clock.Ms / 1000000;
-    long kMsPart = (clock.Ms / 1000) % 1000;
-    long msPart = clock.Ms % 1000;
-    results[0] = 0x30 + dayPart / 100;
-    results[1] = 0x30 + ((dayPart / 10) % 10);
-    results[2] = 0x30 + dayPart % 10;
-    results[3] = '-';
-    results[4] = 0x30 + ((mMsPart / 10) % 10);
-    results[5] = 0x30 + mMsPart % 10;
-    results[6] = 0x30 + kMsPart / 100;
-    results[7] = 0x30 + ((kMsPart / 10) % 10);
-    results[8] = 0x30 + kMsPart % 10;
-    results[9] = 0x30 + msPart / 100;
-    results[10] = 0x30 + ((msPart / 10) % 10);
-    results[11] = 0x30 + msPart % 10;
-    results[12] = '\0'; //always this one must be the last character
+void IsosDebugBasic_GetPrintClock(IsosClock clock, char* results){
+  short dayPart = clock.Day;
+  long mMsPart = clock.Ms / 1000000;
+  long kMsPart = (clock.Ms / 1000) % 1000;
+  long msPart = clock.Ms % 1000;
+  results[0] = 0x30 + dayPart / 100;
+  results[1] = 0x30 + ((dayPart / 10) % 10);
+  results[2] = 0x30 + dayPart % 10;
+  results[3] = '-';
+  results[4] = 0x30 + ((mMsPart / 10) % 10);
+  results[5] = 0x30 + mMsPart % 10;
+  results[6] = 0x30 + kMsPart / 100;
+  results[7] = 0x30 + ((kMsPart / 10) % 10);
+  results[8] = 0x30 + kMsPart % 10;
+  results[9] = 0x30 + msPart / 100;
+  results[10] = 0x30 + ((msPart / 10) % 10);
+  results[11] = 0x30 + msPart % 10;
+  results[12] = '\0'; //always this one must be the last character
 }
 
-void IsosDebugBasic_PrintTaskInfo(struct IsosTaskInfo* taskInfo){
-    char mainClockResults[13], clockResults[13];
-    struct IsosClock mainClock = Isos_GetClock();
+void IsosDebugBasic_PrintTaskInfo(IsosTaskInfo* taskInfo){
+  char mainClockResults[13], clockResults[13];
+  IsosClock mainClock = Isos_GetClock();
+  IsosDebugBasic_GetPrintClock(mainClock, mainClockResults);
+  IsosDebugBasic_GetPrintClock(taskInfo->Type < 2 ? taskInfo->ExecutionDue : taskInfo->Period, clockResults);
+  printf("%s: Task %02d-S%02d [%s P%03d] T:%s is %s\n", mainClockResults,
+         taskInfo->Id, taskInfo->ActionInfo.Subtask, IsosDebugBasic_TaskTypeToString(taskInfo->Type), taskInfo->Priority,
+         clockResults, IsosDebugBasic_TaskStateToString(taskInfo->ActionInfo.State));
+}
+
+void IsosDebugBasic_PrintDueTasks(IsosDueTask* dueTask, short dueSize){
+  short i;
+  IsosClock mainClock = Isos_GetClock();
+  char mainClockResults[13];
+  if (dueSize <= 0)
+    return;
+  if (PRINT_DUE_TASK_HEADER){
     IsosDebugBasic_GetPrintClock(mainClock, mainClockResults);
-    IsosDebugBasic_GetPrintClock(taskInfo->Type < 2 ? taskInfo->ExecutionDue : taskInfo->Period, clockResults);
-    printf("%s: Task %02d-S%02d [%s P%03d] T:%s is %s\n", mainClockResults,
-           taskInfo->Id, taskInfo->ActionInfo.Subtask, IsosDebugBasic_TaskTypeToString(taskInfo->Type), taskInfo->Priority,
-           clockResults, IsosDebugBasic_TaskStateToString(taskInfo->ActionInfo.State));
-}
-
-void IsosDebugBasic_PrintDueTasks(struct IsosDueTask* dueTask, short dueSize){
-    short i;
-    struct IsosClock mainClock = Isos_GetClock();
-    char mainClockResults[13];
-    if (dueSize <= 0)
-        return;
-    if (PRINT_DUE_TASK_HEADER){
-        IsosDebugBasic_GetPrintClock(mainClock, mainClockResults);
-        printf("%s: Due Task(s): [", mainClockResults);
-        for (i = dueSize - 1; i >= 0; --i){
-            if (i < dueSize - 1)
-                printf(", ");
-            printf("%02d-P%03d", dueTask[i].TaskId, dueTask[i].Priority);
-        }
-        printf("]\n");
-        printf("------------------------------------------------------------------------------------------------\n");
+    printf("%s: Due Task(s): [", mainClockResults);
+    for (i = dueSize - 1; i >= 0; --i){
+      if (i < dueSize - 1)
+        printf(", ");
+      printf("%02d-P%03d", dueTask[i].TaskId, dueTask[i].Priority);
     }
+    printf("]\n");
+    printf("------------------------------------------------------------------------------------------------\n");
+  }
 }
 
 void IsosDebugBasic_PrintDueTasksEnding(short dueSize){
-    if (PRINT_DUE_TASK_HEADER)
-        if (dueSize > 0)
-            printf("\n");
+  if (PRINT_DUE_TASK_HEADER)
+    if (dueSize > 0)
+      printf("\n");
 }
 
 void IsosDebugBasic_PrintSubtaskNote(char subtaskCase, short subtaskDirectionNo){
-    if (PRINT_SUBTASK_EVENT){
-        IsosDebugBasic_PrintFrontBlank();
-        if (subtaskCase > 0){
-            printf("Successful case, move to Subtask %d\n", subtaskDirectionNo);
-        } else if (subtaskCase == 0){
-            printf("Waiting resource to finish, stay in Subtask %d\n", subtaskDirectionNo);
-        } else {
-            printf("Failed case, move to Subtask %d\n", subtaskDirectionNo);
-        }
+  if (PRINT_SUBTASK_EVENT){
+    IsosDebugBasic_PrintFrontBlank();
+    if (subtaskCase > 0){
+      printf("Successful case, move to Subtask %d\n", subtaskDirectionNo);
+    } else if (subtaskCase == 0){
+      printf("Waiting resource to finish, stay in Subtask %d\n", subtaskDirectionNo);
+    } else {
+      printf("Failed case, move to Subtask %d\n", subtaskDirectionNo);
     }
+  }
 }
 
-void IsosDebugBasic_PrintWaitingNote(struct IsosTaskInfo* taskInfo){
-    char clockResults[13];
-    if (PRINT_SUBTASK_EVENT){
-        IsosDebugBasic_GetPrintClock(taskInfo->SuspensionDue, clockResults);
-        IsosDebugBasic_PrintFrontBlank();
-        printf("Task [%d] is [Suspended] until T:%s\n", taskInfo->Id, clockResults);
-    }
+void IsosDebugBasic_PrintWaitingNote(IsosTaskInfo* taskInfo){
+  char clockResults[13];
+  if (PRINT_SUBTASK_EVENT){
+    IsosDebugBasic_GetPrintClock(taskInfo->SuspensionDue, clockResults);
+    IsosDebugBasic_PrintFrontBlank();
+    printf("Task [%d] is [Suspended] until T:%s\n", taskInfo->Id, clockResults);
+  }
 }
 
-void IsosDebugBasic_PrintEndWaitingNote(struct IsosTaskInfo* taskInfo){
-    if (PRINT_SUBTASK_EVENT)
-        printf("[Note]      : Task [%d] suspension time is over\n", taskInfo->Id);
+void IsosDebugBasic_PrintEndWaitingNote(IsosTaskInfo* taskInfo){
+  if (PRINT_SUBTASK_EVENT)
+    printf("[Note]      : Task [%d] suspension time is over\n", taskInfo->Id);
 }
 
 

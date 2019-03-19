@@ -49,55 +49,55 @@
 #define MAX_PRIORITY 100 //like immediately needs to be run
 #define CLOCK_PERIOD_DAY 0 //0-32,767 depending on the clock speed, this may be adjusted
 #define CLOCK_PERIOD_MS 10 //0-86,399,999 depending on the clock speed, this may be adjusted
-#define RESOURCE_SIZE 8 //should be identical number with enum IsosResourceTaskType
+#define RESOURCE_SIZE 8 //should be identical number with IsosResourceTaskType
 
-enum IsosTaskType {
-    //Non-cyclical
-    IsosTaskType_RunOnce,  //used for task needs to be run only once
-    IsosTaskType_Resource, //used to mark resource task type, otherwise actually very similar to run once
+typedef enum IsosTaskTypeEnum {
+  //Non-cyclical
+  IsosTaskType_RunOnce,  //used for task needs to be run only once
+  IsosTaskType_Resource, //used to mark resource task type, otherwise actually very similar to run once
 
-    //Cyclical
-    IsosTaskType_LooselyRepeated, //when delayed, start over the period calculation for the next execution from the last time the task is finished
-    IsosTaskType_Repeated, //when delayed, start over the period calculation for the next execution from the last time the task is executed
-    IsosTaskType_Periodic, //when delayed, start over the period calculation for the next execution from the last time the task is due
-};
+  //Cyclical
+  IsosTaskType_LooselyRepeated, //when delayed, start over the period calculation for the next execution from the last time the task is finished
+  IsosTaskType_Repeated, //when delayed, start over the period calculation for the next execution from the last time the task is executed
+  IsosTaskType_Periodic, //when delayed, start over the period calculation for the next execution from the last time the task is due
+} IsosTaskType;
 
-enum IsosTaskState {
-    IsosTaskState_Undefined = -1, //not used most of the time
-    IsosTaskState_Initial, //is initialized, the very first time
-    IsosTaskState_Running, //running - does not mean executed
-    IsosTaskState_Suspended, //suspended for whatever reason
-    IsosTaskState_Failed, //finished and failed
-    IsosTaskState_Success, //finished and successful
-};
+typedef enum IsosTaskStateEnum {
+  IsosTaskState_Undefined = -1, //not used most of the time
+  IsosTaskState_Initial, //is initialized, the very first time
+  IsosTaskState_Running, //running - does not mean executed
+  IsosTaskState_Suspended, //suspended for whatever reason
+  IsosTaskState_Failed, //finished and failed
+  IsosTaskState_Success, //finished and successful
+} IsosTaskState;
 
 //The shared info means it is shared with the task action which runs it
-struct IsosTaskActionInfo {
-    enum IsosTaskState State; //The state of the task - so that it can be changed to success, failed, or suspended
-    char Enabled; //flag to specify if a task is enabled or not - so that the task action can disabled its own task if necessary
-    unsigned char Subtask; //just a number indicating its current subtask - so that the task action can change its own subtask
-    unsigned char Flags[TASK_FLAGS_SIZE]; //just simple, additional semaphore flags to indicate task result, if there is any - so that the task action can share its results
-    //for resource task, Flags = Next Claimer Flag | Next Claimer Id | Next Claimer Priority | Reserved
-};
+typedef struct IsosTaskActionInfoStruct {
+  IsosTaskState State; //The state of the task - so that it can be changed to success, failed, or suspended
+  char Enabled; //flag to specify if a task is enabled or not - so that the task action can disabled its own task if necessary
+  unsigned char Subtask; //just a number indicating its current subtask - so that the task action can change its own subtask
+  unsigned char Flags[TASK_FLAGS_SIZE]; //just simple, additional semaphore flags to indicate task result, if there is any - so that the task action can share its results
+  //for resource task, Flags = Next Claimer Flag | Next Claimer Id | Next Claimer Priority | Reserved
+} IsosTaskActionInfo;
 
-struct IsosTaskInfo {
-    //Declaring the task Id outside is useless, since it will be determined by the ISOS on registration...
-    unsigned char Id; //The Id of the task, to be used for arrangement, basically the same as index of the task in the register
-    unsigned char Priority; //the higher the more priority
-    struct IsosTaskActionInfo ActionInfo; //the action info of the task
-    enum IsosTaskType Type; //The type of the task
-    struct IsosClock LastDueReported; //The last time the task is reported to be on due (supposed to be executed)
-    struct IsosClock LastExecuted; //The last time the task is executed (started to be executed)
-    struct IsosClock LastFinished; //The last time the task is finished
-    struct IsosClock Period; //The period of the task, not applied for "Once" task type
-    struct IsosClock ExecutionDue; //The time for the task to be run - only applicable for RunOnce tasks
-    struct IsosClock SuspensionDue; //The time for the task to be started to be considered in the scheduler again
-    char IsDueReported; //flag to indicate if the due has been reported
-    char ForcedDue; //special flag to forcefully run the task immediately
-};
+typedef struct IsosTaskInfoStruct {
+  //Declaring the task Id outside is useless, since it will be determined by the ISOS on registration...
+  unsigned char Id; //The Id of the task, to be used for arrangement, basically the same as index of the task in the register
+  unsigned char Priority; //the higher the more priority
+  IsosTaskActionInfo ActionInfo; //the action info of the task
+  IsosTaskType Type; //The type of the task
+  IsosClock LastDueReported; //The last time the task is reported to be on due (supposed to be executed)
+  IsosClock LastExecuted; //The last time the task is executed (started to be executed)
+  IsosClock LastFinished; //The last time the task is finished
+  IsosClock Period; //The period of the task, not applied for "Once" task type
+  IsosClock ExecutionDue; //The time for the task to be run - only applicable for RunOnce tasks
+  IsosClock SuspensionDue; //The time for the task to be started to be considered in the scheduler again
+  char IsDueReported; //flag to indicate if the due has been reported
+  char ForcedDue; //special flag to forcefully run the task immediately
+} IsosTaskInfo;
 
-char IsosTask_IsDue(struct IsosClock* mainClock, struct IsosTaskInfo *taskInfo);
-void IsosTask_ClearActionFlags(struct IsosTaskActionInfo* taskActionInfo);
-void IsosTask_ResetState(struct IsosTaskInfo *taskInfo);
+char IsosTask_IsDue(IsosClock* mainClock, IsosTaskInfo *taskInfo);
+void IsosTask_ClearActionFlags(IsosTaskActionInfo* taskActionInfo);
+void IsosTask_ResetState(IsosTaskInfo *taskInfo);
 
 #endif

@@ -36,19 +36,19 @@
 
 #include "isos.h"
 
-char* IsosDebugBasic_TaskTypeToString(enum IsosTaskType type);
-char* IsosDebugBasic_ResourceTypeToString(enum IsosResourceTaskType type);
-char* IsosDebugBasic_TaskStateToString(enum IsosTaskState state);
+char* IsosDebugBasic_TaskTypeToString(IsosTaskType type);
+char* IsosDebugBasic_ResourceTypeToString(IsosResourceTaskType type);
+char* IsosDebugBasic_TaskStateToString(IsosTaskState state);
 void IsosDebugBasic_PrintFrontBlank();
-void IsosDebugBasic_PrintResourceClaiming(enum IsosResourceTaskType type, char result, unsigned char id);
-void IsosDebugBasic_PrintResourceChecking(enum IsosResourceTaskType type, enum IsosTaskState state, unsigned char id);
-void IsosDebugBasic_PrintResourceReleasing(enum IsosResourceTaskType type, unsigned char id);
-void IsosDebugBasic_GetPrintClock(struct IsosClock clock, char* results);
-void IsosDebugBasic_PrintTaskInfo(struct IsosTaskInfo* taskInfo);
-void IsosDebugBasic_PrintDueTasks(struct IsosDueTask* dueTask, short dueSize);
+void IsosDebugBasic_PrintResourceClaiming(IsosResourceTaskType type, char result, unsigned char id);
+void IsosDebugBasic_PrintResourceChecking(IsosResourceTaskType type, IsosTaskState state, unsigned char id);
+void IsosDebugBasic_PrintResourceReleasing(IsosResourceTaskType type, unsigned char id);
+void IsosDebugBasic_GetPrintClock(IsosClock clock, char* results);
+void IsosDebugBasic_PrintTaskInfo(IsosTaskInfo* taskInfo);
+void IsosDebugBasic_PrintDueTasks(IsosDueTask* dueTask, short dueSize);
 void IsosDebugBasic_PrintDueTasksEnding(short dueSize);
 void IsosDebugBasic_PrintSubtaskNote(char subtaskCase, short subtaskDirectionNo);
-void IsosDebugBasic_PrintWaitingNote(struct IsosTaskInfo* taskInfo);
-void IsosDebugBasic_PrintEndWaitingNote(struct IsosTaskInfo* taskInfo);
+void IsosDebugBasic_PrintWaitingNote(IsosTaskInfo* taskInfo);
+void IsosDebugBasic_PrintEndWaitingNote(IsosTaskInfo* taskInfo);
 
 #endif

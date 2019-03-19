@@ -39,15 +39,15 @@
 #define S_PER_DAY 86400
 #define MS_PER_DAY (MS_PER_S * S_PER_DAY)
 
-struct IsosClock{
-    short Day;
-    long Ms;
-};
+typedef struct IsosClock{
+  short Day;
+  long Ms;
+} IsosClock;
 
-struct IsosClock IsosClock_Create(short day, long ms);
-void IsosClock_Adjust(struct IsosClock *clock);
-struct IsosClock IsosClock_Add(struct IsosClock *clock, struct IsosClock *addClock);
-struct IsosClock IsosClock_Minus(struct IsosClock *clock, struct IsosClock *minusClock);
-char IsosClock_GetDirection(struct IsosClock *adjustedClock);
+IsosClock IsosClock_Create(short day, long ms);
+void IsosClock_Adjust(IsosClock *clock);
+IsosClock IsosClock_Add(IsosClock *clock, IsosClock *addClock);
+IsosClock IsosClock_Minus(IsosClock *clock, IsosClock *minusClock);
+char IsosClock_GetDirection(IsosClock *adjustedClock);
 
 #endif

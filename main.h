@@ -39,19 +39,19 @@
 
 void registerTasks();
 
-void printRunningTaskInfo(struct IsosTaskInfo* taskInfo);
+void printRunningTaskInfo(IsosTaskInfo* taskInfo);
 
-void RunOnceTask1(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void RunOnceTask2(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void RunOnceTask3(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void LooselyRepeatedTask1(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void LooselyRepeatedTask2(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void LooselyRepeatedTask3(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void RepeatedTask1(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void RepeatedTask2(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void PeriodicTask1(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void PeriodicTask2(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void PeriodicTask3(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void PeriodicTask4(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void ResourceTask1(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
-void ResourceTask2(unsigned char taskId, struct IsosTaskActionInfo* taskActionInfo);
+void RunOnceTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void RunOnceTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void RunOnceTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void LooselyRepeatedTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void LooselyRepeatedTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void LooselyRepeatedTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void RepeatedTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void RepeatedTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void PeriodicTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void PeriodicTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void PeriodicTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void PeriodicTask4(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void ResourceTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void ResourceTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);

@@ -40,44 +40,46 @@
 #include "isos_task.h"
 
 //To tell the OS about the resource task type being stored, used for mapping it to the task id
-enum IsosResourceTaskType {
-    IsosResourceTaskType_Unspecified = -1,
-    IsosResourceTaskType_Type1 = 0,
-    IsosResourceTaskType_Type2,
-    IsosResourceTaskType_Type3,
-    IsosResourceTaskType_Type4,
-    IsosResourceTaskType_Type5,
-    IsosResourceTaskType_Type6,
-    IsosResourceTaskType_Type7,
-    IsosResourceTaskType_Type8
-};
+typedef enum IsosResourceTaskTypeEnum {
+  IsosResourceTaskType_Unspecified = -1,
+  IsosResourceTaskType_Type1 = 0,
+  IsosResourceTaskType_Type2,
+  IsosResourceTaskType_Type3,
+  IsosResourceTaskType_Type4,
+  IsosResourceTaskType_Type5,
+  IsosResourceTaskType_Type6,
+  IsosResourceTaskType_Type7,
+  IsosResourceTaskType_Type8
+} IsosResourceTaskType;
 
-struct IsosTask {
-    struct IsosTaskInfo Info;
-    void (*Action)(unsigned char, struct IsosTaskActionInfo*);
-};
+typedef struct IsosTaskStruct {
+  IsosTaskInfo Info;
+  void (*Action)(unsigned char, IsosTaskActionInfo*);
+} IsosTask;
 
-struct IsosDueTask {
-    short TaskId; //the task index of the due task
-    unsigned char Priority; //the task priority of the due task
-};
+typedef struct IsosDueTaskStruct {
+  short TaskId; //the task index of the due task
+  unsigned char Priority; //the task priority of the due task
+} IsosDueTask;
 
 void Isos_Init();
-char Isos_RegisterRunOnceTask(char enabled, short executionDueDay, long executionDueMs, unsigned char priority, void (*taskAction)(unsigned char, struct IsosTaskActionInfo*));
-char Isos_RegisterResourceTask(enum IsosResourceTaskType resourceType, unsigned char priority, void (*taskAction)(unsigned char, struct IsosTaskActionInfo*));
-char Isos_RegisterLooselyRepeatedTask(char enabled, short periodDay, long periodMs, unsigned char priority, void (*taskAction)(unsigned char, struct IsosTaskActionInfo*));
-char Isos_RegisterRepeatedTask(char enabled, short periodDay, long periodMs, unsigned char priority, void (*taskAction)(unsigned char, struct IsosTaskActionInfo*));
-char Isos_RegisterPeriodicTask(char enabled, short periodDay, long periodMs, unsigned char priority, void (*taskAction)(unsigned char, struct IsosTaskActionInfo*));
-void Isos_ScheduleRunOnceTask(struct IsosTaskInfo* taskInfo, unsigned char priority, char withReset, short executionDueDay, long executionDueMs);
-void Isos_DueNonCyclicalTaskNow(struct IsosTaskInfo* taskInfo, unsigned char priority, char withReset);
-void Isos_DueTaskNow(struct IsosTaskInfo* taskInfo, unsigned char priority, char withReset);
-struct IsosClock Isos_GetClock();
+char Isos_RegisterRunOnceTask(char enabled, short executionDueDay, long executionDueMs, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*));
+char Isos_RegisterResourceTask(IsosResourceTaskType resourceType, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*));
+char Isos_RegisterLooselyRepeatedTask(char enabled, short periodDay, long periodMs, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*));
+char Isos_RegisterRepeatedTask(char enabled, short periodDay, long periodMs, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*));
+char Isos_RegisterPeriodicTask(char enabled, short periodDay, long periodMs, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*));
+void Isos_ScheduleRunOnceTask(IsosTaskInfo* taskInfo, unsigned char priority, char withReset, short executionDueDay, long executionDueMs);
+void Isos_DueNonCyclicalTaskNow(IsosTaskInfo* taskInfo, unsigned char priority, char withReset);
+void Isos_DueTaskNow(IsosTaskInfo* taskInfo, unsigned char priority, char withReset);
+IsosClock Isos_GetClock();
 void Isos_Run();
 unsigned char Isos_GetTaskFlags(unsigned char taskId, unsigned char flagNo);
-char Isos_ClaimResourceTask(unsigned char claimerTaskId, enum IsosResourceTaskType type);
-enum IsosTaskState Isos_GetResourceTaskState(enum IsosResourceTaskType type);
-void Isos_ReleaseResourceTask(enum IsosResourceTaskType type, struct IsosTaskActionInfo* releaserActionInfo);
+char Isos_ClaimResourceTask(unsigned char claimerTaskId, IsosResourceTaskType type);
+IsosTaskState Isos_GetResourceTaskState(IsosResourceTaskType type);
+void Isos_ReleaseResourceTask(IsosResourceTaskType type, IsosTaskActionInfo* releaserActionInfo);
 void Isos_Wait(unsigned char taskId, short waitingDay, long waitingMs);
 void Isos_Tick();
+IsosTask* Isos_GetTask(unsigned char taskId); //intended to be called by "super user" outside
+short Isos_GetTaskSize();
 
 #endif
