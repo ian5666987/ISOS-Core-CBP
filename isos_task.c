@@ -37,28 +37,28 @@
 #include <string.h>
 #include "isos_task.h"
 
-IsosClock IsosTask_getCycleTaskNextDue(IsosTaskInfo *taskInfo){
+IsosClock IsosTask_getCycleTaskNextDue(const IsosTaskInfo *taskInfo){
   //Use internally, IsosTaskType_RunOnce and IsosTaskType_Resource cases need not be handled
   switch(taskInfo->Type){
   case IsosTaskType_LooselyRepeated:
-    return IsosClock_Add(&taskInfo->LastFinished, &taskInfo->Period);
+    return IsosClock_Add(&taskInfo->LastFinished, &taskInfo->TimeInfo.Period);
   case IsosTaskType_Repeated:
-    return IsosClock_Add(&taskInfo->LastExecuted, &taskInfo->Period);
+    return IsosClock_Add(&taskInfo->LastExecuted, &taskInfo->TimeInfo.Period);
   default:
-    return IsosClock_Add(&taskInfo->LastDueReported, &taskInfo->Period); //default case, assume periodic task
+    return IsosClock_Add(&taskInfo->LastDueReported, &taskInfo->TimeInfo.Period); //default case, assume periodic task
   }
 }
 
-IsosClock IsosTask_getCycleTaskDiffToNextDue(IsosClock* mainClock, IsosTaskInfo *taskInfo){
+IsosClock IsosTask_getCycleTaskDiffToNextDue(const IsosClock* mainClock, const IsosTaskInfo *taskInfo){
   IsosClock clock = IsosTask_getCycleTaskNextDue(taskInfo);
   return IsosClock_Minus(mainClock, &clock);
 }
 
 //Function to check if a task is due, task which is already due should be checked here in the first place
-char IsosTask_IsDue(IsosClock* mainClock, IsosTaskInfo *taskInfo){
+char IsosTask_IsDue(const IsosClock* mainClock, const IsosTaskInfo *taskInfo){
   IsosClock clock; //if run once or resource task, check if it is due compared to the main clock, periodic or repeated, then just
   clock = taskInfo->Type == IsosTaskType_RunOnce || taskInfo->Type == IsosTaskType_Resource ?
-    IsosClock_Minus(mainClock, &taskInfo->ExecutionDue) :
+    IsosClock_Minus(mainClock, &taskInfo->TimeInfo.ExecutionDue) :
     IsosTask_getCycleTaskDiffToNextDue(mainClock, taskInfo);
   return IsosClock_GetDirection(&clock) >= 0;
 }

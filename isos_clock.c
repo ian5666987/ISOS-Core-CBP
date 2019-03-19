@@ -64,14 +64,14 @@ void IsosClock_Adjust(IsosClock *clock){
 }
 
 //Ideally, add clock is always positive
-IsosClock IsosClock_Add(IsosClock* clock, IsosClock* addClock){
+IsosClock IsosClock_Add(const IsosClock* clock, const IsosClock* addClock){
   IsosClock resultClock;
   resultClock = IsosClock_Create(clock->Day + addClock->Day, clock->Ms + addClock->Ms);
   IsosClock_Adjust(&resultClock);
   return resultClock;
 }
 
-IsosClock IsosClock_Minus(IsosClock *clock, IsosClock *minusClock){
+IsosClock IsosClock_Minus(const IsosClock *clock, const IsosClock *minusClock){
   IsosClock resultClock;
   resultClock = IsosClock_Create(clock->Day - minusClock->Day, clock->Ms - minusClock->Ms);
   IsosClock_Adjust(&resultClock);
@@ -79,7 +79,7 @@ IsosClock IsosClock_Minus(IsosClock *clock, IsosClock *minusClock){
 }
 
 //The input is an adjusted clock
-char IsosClock_GetDirection(IsosClock *adjustedClock){
+char IsosClock_GetDirection(const IsosClock *adjustedClock){
   if(adjustedClock->Day == 0 && adjustedClock->Ms == 0)
     return 0; //this is neutral clock direction
   if(adjustedClock->Day > 0)

@@ -42,7 +42,7 @@
 
 int main() {
   IsosClock mainClock;
-  char val;
+  char val = '\0';
   Isos_Init(); //the first to be called before registering any task
   registerTasks();
 
@@ -121,11 +121,11 @@ void simulateCommonTaskWithResourceUsage(unsigned char taskId, IsosTaskActionInf
   case 1:
     taskState = Isos_GetResourceTaskState(type);
     if (taskState == IsosTaskState_Success){
-        Isos_ReleaseResourceTask(type, taskActionInfo);
+        Isos_ReleaseResourceTask(type);
         taskActionInfo->Subtask = 2; //go to substate 2
         IsosDebugBasic_PrintSubtaskNote(1, 2);
     } else if (taskState == IsosTaskState_Failed) {
-        Isos_ReleaseResourceTask(type, taskActionInfo);
+        Isos_ReleaseResourceTask(type);
         taskActionInfo->Subtask = 3; //go to substate 3
         IsosDebugBasic_PrintSubtaskNote(-1, 3);
     } else {
@@ -154,11 +154,11 @@ void simulateCommonTaskWithMultiResourcesUsage(unsigned char taskId, IsosTaskAct
   case 1:
     taskState = Isos_GetResourceTaskState(type1);
     if (taskState == IsosTaskState_Success){
-        Isos_ReleaseResourceTask(type1, taskActionInfo);
+        Isos_ReleaseResourceTask(type1);
         taskActionInfo->Subtask++; //go to next substate
         IsosDebugBasic_PrintSubtaskNote(1, 2);
     } else if (taskState == IsosTaskState_Failed) {
-        Isos_ReleaseResourceTask(type1, taskActionInfo);
+        Isos_ReleaseResourceTask(type1);
         taskActionInfo->Subtask = 5; //go to substate 5
         IsosDebugBasic_PrintSubtaskNote(-1, 5);
     } else {
@@ -173,11 +173,11 @@ void simulateCommonTaskWithMultiResourcesUsage(unsigned char taskId, IsosTaskAct
   case 3:
     taskState = Isos_GetResourceTaskState(type2);
     if (taskState == IsosTaskState_Success){
-        Isos_ReleaseResourceTask(type2, taskActionInfo);
+        Isos_ReleaseResourceTask(type2);
         taskActionInfo->Subtask++; //go to next substate
         IsosDebugBasic_PrintSubtaskNote(1, 4);
     } else if (taskState == IsosTaskState_Failed) {
-        Isos_ReleaseResourceTask(type2, taskActionInfo);
+        Isos_ReleaseResourceTask(type2);
         taskActionInfo->Subtask = 5; //go to substate 5
         IsosDebugBasic_PrintSubtaskNote(-1, 5);
     } else {

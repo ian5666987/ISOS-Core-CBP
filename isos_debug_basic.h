@@ -36,6 +36,27 @@
 
 #include "isos.h"
 
+/* Bit-fields have certain restrictions. You cannot take the address of a bit-field. Bitfields
+cannot be arrayed. They cannot be declared as static. You cannot know, from
+machine to machine, whether the fields will run from right to left or from left to right;
+this implies that any code using bit-fields may have some machine dependencies */
+
+//Example on how to create bit-field in C
+//-> unsigned [name]: [bit-field size]
+typedef struct IsosFlagsExampleStruct {
+  unsigned Flag00: 1;
+  unsigned Flag01: 1;
+  unsigned Flag02: 1;
+  unsigned Flag03: 1;
+  unsigned Flag04: 1;
+  unsigned Flag05: 1;
+  unsigned Flag06: 1;
+  unsigned Flag07: 1;
+  unsigned Flag0815: 8;
+  unsigned Flag1623: 8;
+  unsigned Flag2431: 8;
+} IsosFlagsExample;
+
 char* IsosDebugBasic_TaskTypeToString(IsosTaskType type);
 char* IsosDebugBasic_ResourceTypeToString(IsosResourceTaskType type);
 char* IsosDebugBasic_TaskStateToString(IsosTaskState state);
@@ -43,12 +64,13 @@ void IsosDebugBasic_PrintFrontBlank();
 void IsosDebugBasic_PrintResourceClaiming(IsosResourceTaskType type, char result, unsigned char id);
 void IsosDebugBasic_PrintResourceChecking(IsosResourceTaskType type, IsosTaskState state, unsigned char id);
 void IsosDebugBasic_PrintResourceReleasing(IsosResourceTaskType type, unsigned char id);
-void IsosDebugBasic_GetPrintClock(IsosClock clock, char* results);
-void IsosDebugBasic_PrintTaskInfo(IsosTaskInfo* taskInfo);
-void IsosDebugBasic_PrintDueTasks(IsosDueTask* dueTask, short dueSize);
+void IsosDebugBasic_GetPrintClock(const IsosClock* clock, char* results);
+void IsosDebugBasic_PrintClock(const IsosClock* clock);
+void IsosDebugBasic_PrintTaskInfo(const IsosTaskInfo* taskInfo);
+void IsosDebugBasic_PrintDueTasks(const IsosDueTask* dueTask, short dueSize);
 void IsosDebugBasic_PrintDueTasksEnding(short dueSize);
 void IsosDebugBasic_PrintSubtaskNote(char subtaskCase, short subtaskDirectionNo);
-void IsosDebugBasic_PrintWaitingNote(IsosTaskInfo* taskInfo);
-void IsosDebugBasic_PrintEndWaitingNote(IsosTaskInfo* taskInfo);
+void IsosDebugBasic_PrintWaitingNote(const IsosTaskInfo* taskInfo);
+void IsosDebugBasic_PrintEndWaitingNote(const IsosTaskInfo* taskInfo);
 
 #endif

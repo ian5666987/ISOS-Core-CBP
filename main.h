@@ -39,8 +39,6 @@
 
 void registerTasks();
 
-void printRunningTaskInfo(IsosTaskInfo* taskInfo);
-
 void RunOnceTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
 void RunOnceTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
 void RunOnceTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);

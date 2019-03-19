@@ -101,11 +101,12 @@ void IsosDebugBasic_PrintResourceReleasing(IsosResourceTaskType type, unsigned c
   }
 }
 
-void IsosDebugBasic_GetPrintClock(IsosClock clock, char* results){
-  short dayPart = clock.Day;
-  long mMsPart = clock.Ms / 1000000;
-  long kMsPart = (clock.Ms / 1000) % 1000;
-  long msPart = clock.Ms % 1000;
+//Ensuring the value of clock to be unchanged inside the function
+void IsosDebugBasic_GetPrintClock(const IsosClock* clock, char* results){
+  short dayPart = clock->Day;
+  long mMsPart = clock->Ms / 1000000;
+  long kMsPart = (clock->Ms / 1000) % 1000;
+  long msPart = clock->Ms % 1000;
   results[0] = 0x30 + dayPart / 100;
   results[1] = 0x30 + ((dayPart / 10) % 10);
   results[2] = 0x30 + dayPart % 10;
@@ -121,24 +122,30 @@ void IsosDebugBasic_GetPrintClock(IsosClock clock, char* results){
   results[12] = '\0'; //always this one must be the last character
 }
 
-void IsosDebugBasic_PrintTaskInfo(IsosTaskInfo* taskInfo){
+void IsosDebugBasic_PrintClock(const IsosClock* clock){
+  char results[13];
+  IsosDebugBasic_GetPrintClock(clock, results);
+  printf("%s", results);
+}
+
+void IsosDebugBasic_PrintTaskInfo(const IsosTaskInfo* taskInfo){
   char mainClockResults[13], clockResults[13];
   IsosClock mainClock = Isos_GetClock();
-  IsosDebugBasic_GetPrintClock(mainClock, mainClockResults);
-  IsosDebugBasic_GetPrintClock(taskInfo->Type < 2 ? taskInfo->ExecutionDue : taskInfo->Period, clockResults);
-  printf("%s: Task %02d-S%02d [%s P%03d] T:%s is %s\n", mainClockResults,
+  IsosDebugBasic_GetPrintClock(&mainClock, mainClockResults);
+  IsosDebugBasic_GetPrintClock(&taskInfo->TimeInfo.Any, clockResults);
+  printf("%s: Task %02d-S%02d [%s P%03d] T:%s is %s\n", mainClockResults, //printing like this is a lot easier to see the format
          taskInfo->Id, taskInfo->ActionInfo.Subtask, IsosDebugBasic_TaskTypeToString(taskInfo->Type), taskInfo->Priority,
          clockResults, IsosDebugBasic_TaskStateToString(taskInfo->ActionInfo.State));
 }
 
-void IsosDebugBasic_PrintDueTasks(IsosDueTask* dueTask, short dueSize){
+void IsosDebugBasic_PrintDueTasks(const IsosDueTask* dueTask, short dueSize){
   short i;
   IsosClock mainClock = Isos_GetClock();
   char mainClockResults[13];
   if (dueSize <= 0)
     return;
   if (PRINT_DUE_TASK_HEADER){
-    IsosDebugBasic_GetPrintClock(mainClock, mainClockResults);
+    IsosDebugBasic_GetPrintClock(&mainClock, mainClockResults);
     printf("%s: Due Task(s): [", mainClockResults);
     for (i = dueSize - 1; i >= 0; --i){
       if (i < dueSize - 1)
@@ -169,16 +176,16 @@ void IsosDebugBasic_PrintSubtaskNote(char subtaskCase, short subtaskDirectionNo)
   }
 }
 
-void IsosDebugBasic_PrintWaitingNote(IsosTaskInfo* taskInfo){
-  char clockResults[13];
+void IsosDebugBasic_PrintWaitingNote(const IsosTaskInfo* taskInfo){
   if (PRINT_SUBTASK_EVENT){
-    IsosDebugBasic_GetPrintClock(taskInfo->SuspensionDue, clockResults);
     IsosDebugBasic_PrintFrontBlank();
-    printf("Task [%d] is [Suspended] until T:%s\n", taskInfo->Id, clockResults);
+    printf("Task [%d] is [Suspended] until T:", taskInfo->Id);
+    IsosDebugBasic_PrintClock(&taskInfo->SuspensionDue);
+    printf("\n");
   }
 }
 
-void IsosDebugBasic_PrintEndWaitingNote(IsosTaskInfo* taskInfo){
+void IsosDebugBasic_PrintEndWaitingNote(const IsosTaskInfo* taskInfo){
   if (PRINT_SUBTASK_EVENT)
     printf("[Note]      : Task [%d] suspension time is over\n", taskInfo->Id);
 }

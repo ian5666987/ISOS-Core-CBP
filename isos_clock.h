@@ -46,8 +46,8 @@ typedef struct IsosClock{
 
 IsosClock IsosClock_Create(short day, long ms);
 void IsosClock_Adjust(IsosClock *clock);
-IsosClock IsosClock_Add(IsosClock *clock, IsosClock *addClock);
-IsosClock IsosClock_Minus(IsosClock *clock, IsosClock *minusClock);
-char IsosClock_GetDirection(IsosClock *adjustedClock);
+IsosClock IsosClock_Add(const IsosClock *clock, const IsosClock *addClock);
+IsosClock IsosClock_Minus(const IsosClock *clock, const IsosClock *minusClock);
+char IsosClock_GetDirection(const IsosClock *adjustedClock);
 
 #endif

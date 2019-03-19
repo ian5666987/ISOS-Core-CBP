@@ -45,19 +45,20 @@
 #include "isos_debug_basic.h"
 #endif // BASIC_DEBUG
 
+//All the variable belows shouldn't be used anywhere else, therefore statics, thus cannot be "extern"-ed
 //The main clock used for the whole project
-IsosClock IsosMainClock;
-IsosClock LastSchedulerRun;
-IsosClock LastSchedulerFinished; //probably good for debugging
-IsosClock SchedulerPeriod;
-IsosTask IsosTaskList[MAX_TASK_SIZE];
-IsosDueTask IsosDueTaskList[MAX_TASK_SIZE]; //an array, as required by the QuickSort
-unsigned char IsosResourceTaskList[RESOURCE_SIZE]; //to store the mapping of the resource type to the task Id
-short IsosDueTaskSize = 0;
-short IsosTaskSize = 0;
-char IsosRequestSorting = 0; //a flag to request sorting in the scheduler
-IsosResourceTaskType LastClaimedResourceTask = IsosResourceTaskType_Unspecified; //Used as a flag if there is any resource task that has just been claimed
-IsosResourceTaskType LastReleasedResourceTask = IsosResourceTaskType_Unspecified; //Used as a flag if there is any resource task that has just been released
+static IsosClock IsosMainClock;
+static IsosClock LastSchedulerRun;
+static IsosClock LastSchedulerFinished; //probably good for debugging
+static IsosClock SchedulerPeriod;
+static IsosTask IsosTaskList[MAX_TASK_SIZE];
+static IsosDueTask IsosDueTaskList[MAX_TASK_SIZE]; //an array, as required by the QuickSort
+static unsigned char IsosResourceTaskList[RESOURCE_SIZE]; //to store the mapping of the resource type to the task Id
+static short IsosDueTaskSize = 0;
+static short IsosTaskSize = 0;
+static char IsosRequestSorting = 0; //a flag to request sorting in the scheduler
+static IsosResourceTaskType LastClaimedResourceTask = IsosResourceTaskType_Unspecified; //Used as a flag if there is any resource task that has just been claimed
+static IsosResourceTaskType LastReleasedResourceTask = IsosResourceTaskType_Unspecified; //Used as a flag if there is any resource task that has just been released
 
 //Since it is so common to have these variables, we my as well initialize them outside of functions
 // to save some initialization of variables across different functions
@@ -176,8 +177,8 @@ void Isos_commonPrepareDueNonCyclicalTask(IsosTaskInfo* taskInfo, unsigned char 
   Isos_prepareToDueTask(taskInfo, priority, withReset);
   if (taskInfo->IsDueReported) //already in the task list to run, just continue, no need to re-run
     return;
-  taskInfo->ExecutionDue.Day = clock.Day;
-  taskInfo->ExecutionDue.Ms = clock.Ms;
+  taskInfo->TimeInfo.ExecutionDue.Day = clock.Day;
+  taskInfo->TimeInfo.ExecutionDue.Ms = clock.Ms;
 }
 
 void Isos_scheduler(){
@@ -261,7 +262,7 @@ short Isos_findDueTaskIndex(unsigned char taskId, unsigned char inclusiveSearchL
   return -1; //cannot be found
 }
 
-char Isos_registerTask(IsosTaskType type, IsosResourceTaskType resourceType, char isCyclical, char enabled,
+char Isos_registerTask(IsosTaskType type, IsosResourceTaskType resourceType, char enabled,
                        short timeInfoDay, long timeInfoMs, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*)){
   IsosClock timeInfo;
   IsosTask task;
@@ -272,10 +273,7 @@ char Isos_registerTask(IsosTaskType type, IsosResourceTaskType resourceType, cha
   task.Info.Type = type;
   task.Info.ActionInfo.Enabled = enabled;
   timeInfo = IsosClock_Create(timeInfoDay, timeInfoMs);
-  if (isCyclical) //if cyclical flag is set, then set the period
-    task.Info.Period = timeInfo;
-  else //otherwise, this is a non-cyclical task, set the execution due
-    task.Info.ExecutionDue = timeInfo;
+  task.Info.TimeInfo.Any = timeInfo; //"Any" will adjust internally
   task.Info.Priority = priority;
   task.Info.Id = IsosTaskSize; //the Id follows whatever is the current task set size
   task.Action = taskAction;
@@ -287,24 +285,24 @@ char Isos_registerTask(IsosTaskType type, IsosResourceTaskType resourceType, cha
 }
 
 char Isos_RegisterRunOnceTask(char enabled, short executionDueDay, long executionDueMs, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*)){
-  return Isos_registerTask(IsosTaskType_RunOnce, IsosResourceTaskType_Unspecified, 0, enabled, executionDueDay, executionDueMs, priority, taskAction);
+  return Isos_registerTask(IsosTaskType_RunOnce, IsosResourceTaskType_Unspecified, enabled, executionDueDay, executionDueMs, priority, taskAction);
 }
 
 char Isos_RegisterResourceTask(IsosResourceTaskType resourceType, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*)){
   //resource task always started disabled, only to be enabled when needed to be run
-  return Isos_registerTask(IsosTaskType_Resource, resourceType, 0, 0, 0, 0, priority, taskAction);
+  return Isos_registerTask(IsosTaskType_Resource, resourceType, 0, 0, 0, priority, taskAction);
 }
 
 char Isos_RegisterLooselyRepeatedTask(char enabled, short periodDay, long periodMs, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*)){
-  return Isos_registerTask(IsosTaskType_LooselyRepeated, IsosResourceTaskType_Unspecified, 1, enabled, periodDay, periodMs, priority, taskAction);
+  return Isos_registerTask(IsosTaskType_LooselyRepeated, IsosResourceTaskType_Unspecified, enabled, periodDay, periodMs, priority, taskAction);
 }
 
 char Isos_RegisterRepeatedTask(char enabled, short periodDay, long periodMs, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*)){
-  return Isos_registerTask(IsosTaskType_Repeated, IsosResourceTaskType_Unspecified, 1, enabled, periodDay, periodMs, priority, taskAction);
+  return Isos_registerTask(IsosTaskType_Repeated, IsosResourceTaskType_Unspecified, enabled, periodDay, periodMs, priority, taskAction);
 }
 
 char Isos_RegisterPeriodicTask(char enabled, short periodDay, long periodMs, unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*)){
-  return Isos_registerTask(IsosTaskType_Periodic, IsosResourceTaskType_Unspecified, 1, enabled, periodDay, periodMs, priority, taskAction);
+  return Isos_registerTask(IsosTaskType_Periodic, IsosResourceTaskType_Unspecified, enabled, periodDay, periodMs, priority, taskAction);
 }
 
 //Function to schedule a RunOnce task to be run sometime in the future with specified priority
@@ -457,7 +455,7 @@ char Isos_ClaimResourceTask(unsigned char claimerTaskId, IsosResourceTaskType ty
     return 0;
   }
   genericTaskActionInfo->Enabled = 1; //enable the resource task for use
-  genericTaskInfo->ExecutionDue = Isos_GetClock(); //execute immediately
+  genericTaskInfo->TimeInfo.ExecutionDue = Isos_GetClock(); //execute immediately
   LastClaimedResourceTask = type;
   #if BASIC_DEBUG
   IsosDebugBasic_PrintResourceClaiming(type, 1, IsosResourceTaskList[type]);
@@ -482,7 +480,7 @@ IsosTaskState Isos_GetResourceTaskState(IsosResourceTaskType type){
 
 //Function to release a resource task, always successful
 //WARNING: as a best practice, DO NOT claim/release more than one resource task per subtask
-void Isos_ReleaseResourceTask(IsosResourceTaskType type, IsosTaskActionInfo* releaserActionInfo){
+void Isos_ReleaseResourceTask(IsosResourceTaskType type){
   if (type < 0 || type >= RESOURCE_SIZE) //non-existing resource type
     return;
   Isos_prepareGenericTaskPointersById(IsosResourceTaskList[type]);
@@ -518,9 +516,10 @@ void Isos_Tick(){
   }
 }
 
+//May not really be the best way to expose tasks to the outsider, but this function is assumed to be called only by "super-user"
 IsosTask* Isos_GetTask(unsigned char taskId){
   if (taskId < 0 || taskId >= IsosTaskSize)
-    return 0; //TODO change this to be default null pointer if necessary
+    return (void *)0; //null pointer
   return &IsosTaskList[taskId];
 }
 

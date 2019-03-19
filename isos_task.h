@@ -80,6 +80,13 @@ typedef struct IsosTaskActionInfoStruct {
   //for resource task, Flags = Next Claimer Flag | Next Claimer Id | Next Claimer Priority | Reserved
 } IsosTaskActionInfo;
 
+//The two clock items "Period" and "ExecutionDue" will always be mutually exclusive in use, therefore they are a union
+typedef union IsosTaskTimeInfoUnion {
+  IsosClock Any; //To be used when you don't care whether it is Period or ExecutionDue
+  IsosClock Period; //The period of the task, not applied for non-cyclical tasks type
+  IsosClock ExecutionDue; //The time for the task to be run - only applicable for non-cyclical tasks
+} IsosTaskTimeInfo;
+
 typedef struct IsosTaskInfoStruct {
   //Declaring the task Id outside is useless, since it will be determined by the ISOS on registration...
   unsigned char Id; //The Id of the task, to be used for arrangement, basically the same as index of the task in the register
@@ -89,14 +96,13 @@ typedef struct IsosTaskInfoStruct {
   IsosClock LastDueReported; //The last time the task is reported to be on due (supposed to be executed)
   IsosClock LastExecuted; //The last time the task is executed (started to be executed)
   IsosClock LastFinished; //The last time the task is finished
-  IsosClock Period; //The period of the task, not applied for "Once" task type
-  IsosClock ExecutionDue; //The time for the task to be run - only applicable for RunOnce tasks
+  IsosTaskTimeInfo TimeInfo; //The time info for this task, depending on Task's type, different TimeInfo variable may want to be used
   IsosClock SuspensionDue; //The time for the task to be started to be considered in the scheduler again
   char IsDueReported; //flag to indicate if the due has been reported
   char ForcedDue; //special flag to forcefully run the task immediately
 } IsosTaskInfo;
 
-char IsosTask_IsDue(IsosClock* mainClock, IsosTaskInfo *taskInfo);
+char IsosTask_IsDue(const IsosClock* mainClock, const IsosTaskInfo *taskInfo);
 void IsosTask_ClearActionFlags(IsosTaskActionInfo* taskActionInfo);
 void IsosTask_ResetState(IsosTaskInfo *taskInfo);
 

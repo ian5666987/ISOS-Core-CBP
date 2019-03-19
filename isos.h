@@ -76,7 +76,7 @@ void Isos_Run();
 unsigned char Isos_GetTaskFlags(unsigned char taskId, unsigned char flagNo);
 char Isos_ClaimResourceTask(unsigned char claimerTaskId, IsosResourceTaskType type);
 IsosTaskState Isos_GetResourceTaskState(IsosResourceTaskType type);
-void Isos_ReleaseResourceTask(IsosResourceTaskType type, IsosTaskActionInfo* releaserActionInfo);
+void Isos_ReleaseResourceTask(IsosResourceTaskType type);
 void Isos_Wait(unsigned char taskId, short waitingDay, long waitingMs);
 void Isos_Tick();
 IsosTask* Isos_GetTask(unsigned char taskId); //intended to be called by "super user" outside
