@@ -24,6 +24,8 @@ Inspire Satellite Operating System (ISOS) is an (1) easy-to-understand, (2) easy
    - Capable of managing use of shared resources among the tasks using simple claiming-releasing mechanism
    - Capable of segmenting single-function task into various task segments (called subtask)
    - Capable of handling task waiting and simple inter-task signals using char[] flags
+   - Capable of handling (resource) tasks with Tx and/or Rx buffers
+   - Capable of handling task timeouts (that is, killing "dead" tasks)
 
-Created by Ian K (Mar-2019)
-Coded using CodeBlocks 17.12 IDE (http://www.codeblocks.org/)
+Created by: Ian K (c) 2019
+Coded using: CodeBlocks 17.12 IDE (http://www.codeblocks.org/)
