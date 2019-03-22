@@ -74,3 +74,12 @@ void IsosTask_ResetState(IsosTaskInfo *taskInfo){
   taskInfo->IsDueReported = 0;
   taskInfo->ForcedDue = 0;
 }
+
+char IsosTask_IsTimeout(const IsosClock* mainClock, const IsosTaskInfo *taskInfo){
+  IsosClock clock;
+  if (!taskInfo->Timeout.Day && !taskInfo->Timeout.Ms)
+    return 0; //uninitialized timeout values means there is no timeout for this task
+  clock = IsosClock_Minus(mainClock, &taskInfo->LastExecuted);
+  clock = IsosClock_Minus(&taskInfo->Timeout, &clock);
+  return IsosClock_GetDirection(&clock) <= 0; //means the elapsed time since last executed is greater than the allowed time for timeout
+}

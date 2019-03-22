@@ -1,65 +1,92 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
-	<ActiveTarget name="Release" />
-	<File name="isos_quicksort.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<ActiveTarget name="Debug" />
+	<File name="isos.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6261" topLine="92" />
+		</Cursor>
+	</File>
+	<File name="isos_debug_basic.c" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="11460" topLine="243" />
+		</Cursor>
+	</File>
+	<File name="isos_quicksort.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="280" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="isos_clock.c" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="main.c" open="1" top="1" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3867" topLine="45" />
+			<Cursor1 position="8441" topLine="110" />
+		</Cursor>
+		<Folding>
+			<Collapse line="478" />
+			<Collapse line="507" />
+			<Collapse line="533" />
+			<Collapse line="565" />
+			<Collapse line="610" />
+		</Folding>
+	</File>
+	<File name="isos_buffer.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4646" topLine="6" />
 		</Cursor>
 	</File>
-	<File name="isos_task.c" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="isos_utilities.h" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2601" topLine="31" />
+			<Cursor1 position="120" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="isos_debug_basic.c" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5781" topLine="82" />
-		</Cursor>
-	</File>
-	<File name="isos_debug_basic.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3054" topLine="1" />
-		</Cursor>
-	</File>
-	<File name="isos_task.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6798" topLine="64" />
-		</Cursor>
-	</File>
-	<File name="main.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="8449" topLine="153" />
-		</Cursor>
-	</File>
-	<File name="isos.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="27879" topLine="481" />
-		</Cursor>
-	</File>
-	<File name="isos_clock.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2850" topLine="8" />
-		</Cursor>
-	</File>
-	<File name="isos_quicksort.c" open="1" top="1" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="isos_quicksort.c" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="1892" topLine="50" />
 		</Cursor>
 	</File>
-	<File name="isos.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="isos.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4942" topLine="40" />
+			<Cursor1 position="33554" topLine="578" />
+		</Cursor>
+	</File>
+	<File name="isos_buffer.c" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5207" topLine="24" />
+		</Cursor>
+	</File>
+	<File name="isos_clock.c" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3867" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="isos_task.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4988" topLine="73" />
+		</Cursor>
+	</File>
+	<File name="isos_utilities.c" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="287" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="isos_task.c" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3804" topLine="57" />
 		</Cursor>
 	</File>
 	<File name="main.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2646" topLine="6" />
+			<Cursor1 position="4995" topLine="48" />
+		</Cursor>
+	</File>
+	<File name="isos_debug_basic.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4642" topLine="53" />
+		</Cursor>
+	</File>
+	<File name="isos_clock.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2850" topLine="27" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

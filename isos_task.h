@@ -37,6 +37,7 @@
 #define ISOS_TASK_H
 
 #include "isos_clock.h"
+#include "isos_buffer.h"
 
 //DO NOT configure all these "MIN_" macros
 #define MIN_TASK_FLAGS_SIZE 3 //task flags size should NOT be less than 3
@@ -69,6 +70,7 @@ typedef enum IsosTaskStateEnum {
   IsosTaskState_Suspended, //suspended for whatever reason
   IsosTaskState_Failed, //finished and failed
   IsosTaskState_Success, //finished and successful
+  IsosTaskState_Timeout, //finished because of timeout
 } IsosTaskState;
 
 //The shared info means it is shared with the task action which runs it
@@ -87,6 +89,12 @@ typedef union IsosTaskTimeInfoUnion {
   IsosClock ExecutionDue; //The time for the task to be run - only applicable for non-cyclical tasks
 } IsosTaskTimeInfo;
 
+//Since the due and the time of the suspension is always mutually exclusive, this can be made union
+typedef union IsosTaskSuspensionInfoUnion {
+  IsosClock Due; //The time for the task to be started to be considered in the scheduler again
+  IsosClock Time; //The time to be added with the current time to create the suspension due time
+} IsosTaskSuspensionInfo;
+
 typedef struct IsosTaskInfoStruct {
   //Declaring the task Id outside is useless, since it will be determined by the ISOS on registration...
   unsigned char Id; //The Id of the task, to be used for arrangement, basically the same as index of the task in the register
@@ -97,13 +105,15 @@ typedef struct IsosTaskInfoStruct {
   IsosClock LastExecuted; //The last time the task is executed (started to be executed)
   IsosClock LastFinished; //The last time the task is finished
   IsosTaskTimeInfo TimeInfo; //The time info for this task, depending on Task's type, different TimeInfo variable may want to be used
-  IsosClock SuspensionDue; //The time for the task to be started to be considered in the scheduler again
+  IsosTaskSuspensionInfo SuspensionInfo; //The suspension info time for this task, the time can immediately be changed to due after use
   char IsDueReported; //flag to indicate if the due has been reported
   char ForcedDue; //special flag to forcefully run the task immediately
+  IsosClock Timeout; //special clock to indicate the timeout period of a task. Set Timeout.Day = 0 and Timeout.Ms = 0 to give no timeout to a task
 } IsosTaskInfo;
 
 char IsosTask_IsDue(const IsosClock* mainClock, const IsosTaskInfo *taskInfo);
 void IsosTask_ClearActionFlags(IsosTaskActionInfo* taskActionInfo);
 void IsosTask_ResetState(IsosTaskInfo *taskInfo);
+char IsosTask_IsTimeout(const IsosClock* mainClock, const IsosTaskInfo *taskInfo);
 
 #endif

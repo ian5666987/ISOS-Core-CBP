@@ -37,19 +37,40 @@
 
 #include "isos.h"
 
+//For simulation
+//Resource task with Rx buffer only
+#define RX_RETRIEVAL_NO 2 //to simulate on which cycle exactly the simulated RX would have been available for reading
+#define MIN_RX_TO_CHECK 5
+#define RX_DATA_BUFFER 10
+#define TX_TRANSMITTED_NO 4 //to simulate on which cycle exactly the simulated TX would have been sent
+#define TX_DATA_BUFFER 15
+
 void registerTasks();
 
 void RunOnceTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
 void RunOnceTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
-void RunOnceTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void RunOnceTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test lower priority resource task claimer at T:370ms
 void LooselyRepeatedTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
 void LooselyRepeatedTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
-void LooselyRepeatedTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void LooselyRepeatedTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test task with suspension
+void LooselyRepeatedTask4(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test resource task with Rx only buffer
+void LooselyRepeatedTask5(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test resource task with Tx only buffer
 void RepeatedTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
 void RepeatedTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void RepeatedTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test resource task with Tx & Rx buffers, called by size
+void RepeatedTask4(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test resource task with Tx & Rx buffers, called by time
+void RepeatedTask5(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test competing task for the same resource with a stuck-task
 void PeriodicTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
 void PeriodicTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
 void PeriodicTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
 void PeriodicTask4(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
-void ResourceTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
-void ResourceTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void PeriodicTask5(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test OS response for a stuck-task claiming a resource
+void PeriodicTask6(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //task which encounter occasional resource task's timeout
+void ResourceTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //normal resource task
+void ResourceTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //resource task with failure rate
+void ResourceTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //resource task with Tx only buffer
+void ResourceTask4(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //resource task with Rx only buffer
+void ResourceTask5(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //resource task with Tx & Rx buffers, called by size
+void ResourceTask6(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //resource task with Tx & Rx buffers, called by time
+void ResourceTask7(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //normal resource task for a stuck task
+void ResourceTask8(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //resource task with occasional timeout

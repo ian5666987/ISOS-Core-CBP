@@ -36,8 +36,13 @@
 #include "isos_debug_basic.h"
 
 #define PRINT_RESOURCE_EVENT 1
+#define PRINT_BUFFER_EVENT 1
 #define PRINT_SUBTASK_EVENT 1
 #define PRINT_DUE_TASK_HEADER 1
+#define PRINT_OS_TIMEOUT_EVENT 1
+#define BUFFER_PRINTED_DATA_LIMIT 20
+
+extern unsigned char NullBuffer[0];
 
 char* IsosDebugBasic_TaskTypeToString(IsosTaskType type){
   switch(type){
@@ -71,6 +76,7 @@ char* IsosDebugBasic_TaskStateToString(IsosTaskState state){
     case IsosTaskState_Initial: return "Started";
     case IsosTaskState_Running: return "Running";
     case IsosTaskState_Success: return "Completed Successfully";
+    case IsosTaskState_Timeout: return "Timeout";
     case IsosTaskState_Suspended: return "Suspended";
     case IsosTaskState_Undefined:
     default: return "in Unknown state";
@@ -79,11 +85,79 @@ char* IsosDebugBasic_TaskStateToString(IsosTaskState state){
 
 void IsosDebugBasic_PrintFrontBlank(){ printf("              "); }
 
+void IsosDebugBasic_PrintResourceTaskInvalid(IsosResourceTaskType type){
+  if (PRINT_RESOURCE_EVENT){
+    IsosDebugBasic_PrintFrontBlank();
+    printf("Resource [Task Type No: %02d] does not exist\n", type);
+  }
+}
+
+void IsosDebugBasic_printBuffersAvailable(IsosResourceTaskType type){
+  char bufferFlags;
+  if (PRINT_RESOURCE_EVENT){
+    bufferFlags = Isos_GetResourceTaskBufferFlags(type);
+    printf(" [Buffer(s): %s%s]", bufferFlags & 1 ? "Tx" : "", bufferFlags & 2 ? "Rx" : "");
+  }
+}
+
 void IsosDebugBasic_PrintResourceClaiming(IsosResourceTaskType type, char result, unsigned char id){
   if (PRINT_RESOURCE_EVENT){
     IsosDebugBasic_PrintFrontBlank();
-    printf("Claiming resource [%s] [Task Id: %02d]: ", IsosDebugBasic_ResourceTypeToString(type), id);
-    printf(result ? "Successful\n" : "Failed\n");
+    printf("Claiming resource [%s] [Task Id: %02d]", IsosDebugBasic_ResourceTypeToString(type), id);
+    IsosDebugBasic_printBuffersAvailable(type);
+    switch(result){
+      case -1: printf(": Failed (has more important next claimer)\n"); break;
+      case 0:  printf(": Failed (is still claimed or is running)\n"); break;
+      case 1:  printf(": Successful\n"); break;
+    }
+  }
+}
+
+char* IsosDebugBasic_bufferEventToString(char eventNo){
+  switch(eventNo){
+    case 0: return "GET";
+    case 1: return "PEEK";
+    case 2: return "PUT";
+    case 3: return "DATASIZE";
+    case 4: return "TRANSMISSION";
+  }
+  return "UNKNOWN";
+}
+
+void IsosDebugBasic_PrintBufferData(IsosBuffer* buffer){
+  char isTooMany = buffer->DataSize > BUFFER_PRINTED_DATA_LIMIT;
+  int i, excessNo, printedDataNo = isTooMany ? BUFFER_PRINTED_DATA_LIMIT : buffer->DataSize;
+  unsigned char data[BUFFER_PRINTED_DATA_LIMIT];
+  IsosBuffer_Peeks(buffer, data, isTooMany ? BUFFER_PRINTED_DATA_LIMIT : -1); //just get data size not more than the data array can hold
+  IsosDebugBasic_PrintFrontBlank();
+  printf("[");
+  if (printedDataNo <= 0) //no data to print
+    printf("<Empty>");
+  else
+    for (i = 0; i < printedDataNo; ++i){
+      if (i > 0)
+        printf(" ");
+      printf("%.2X", data[i]);
+    }
+  if (isTooMany){
+    excessNo = buffer->DataSize - printedDataNo;
+    printf(" ... +%d more data ", excessNo);
+  }
+  printf("]\n");
+}
+
+//0 -> Get, 1 -> Peek, 2 -> Put
+void IsosDebugBasic_PrintResourceTaskBufferData(IsosResourceTaskType type, IsosBuffer* buffer, char eventNo){
+  IsosBuffer* testBuffer;
+  char isTx, dummyResult;
+  if (PRINT_BUFFER_EVENT){
+    testBuffer = Isos_GetResourceTaskBuffer(&dummyResult, type, 1); //try to get Tx buffer
+    isTx = buffer == testBuffer;
+    IsosDebugBasic_PrintFrontBlank();
+    printf("%s resource [%s] buffer [%cx], size: [available: %d, directed: %d]\n",
+           IsosDebugBasic_bufferEventToString(eventNo), IsosDebugBasic_ResourceTypeToString(type),
+           isTx ? 'T' : 'R', buffer->DataSize, buffer->ExpectedDataSize);
+    IsosDebugBasic_PrintBufferData(buffer);
   }
 }
 
@@ -129,13 +203,16 @@ void IsosDebugBasic_PrintClock(const IsosClock* clock){
 }
 
 void IsosDebugBasic_PrintTaskInfo(const IsosTaskInfo* taskInfo){
-  char mainClockResults[13], clockResults[13];
+  char mainClockResults[13], clockResults[13], timeoutClockResults[13];
+  char hasTimeout = !(taskInfo->Timeout.Day == 0 && taskInfo->Timeout.Ms == 0);
   IsosClock mainClock = Isos_GetClock();
   IsosDebugBasic_GetPrintClock(&mainClock, mainClockResults);
   IsosDebugBasic_GetPrintClock(&taskInfo->TimeInfo.Any, clockResults);
-  printf("%s: Task %02d-S%02d [%s P%03d] T:%s is %s\n", mainClockResults, //printing like this is a lot easier to see the format
+  IsosDebugBasic_GetPrintClock(&taskInfo->Timeout, timeoutClockResults);
+  printf("%s: Task %02d-S%02d [%s P%03d] T:%s%s%s is %s\n", mainClockResults, //printing like this is a lot easier to see the format
          taskInfo->Id, taskInfo->ActionInfo.Subtask, IsosDebugBasic_TaskTypeToString(taskInfo->Type), taskInfo->Priority,
-         clockResults, IsosDebugBasic_TaskStateToString(taskInfo->ActionInfo.State));
+         clockResults, hasTimeout ? " O:" : "", hasTimeout ? timeoutClockResults : "",
+         IsosDebugBasic_TaskStateToString(taskInfo->ActionInfo.State));
 }
 
 void IsosDebugBasic_PrintDueTasks(const IsosDueTask* dueTask, short dueSize){
@@ -163,15 +240,39 @@ void IsosDebugBasic_PrintDueTasksEnding(short dueSize){
       printf("\n");
 }
 
-void IsosDebugBasic_PrintSubtaskNote(char subtaskCase, short subtaskDirectionNo){
+void IsosDebugBasic_PrintSubtaskNote(char subtaskCase, short subtaskDirectionNo, char isResource){
   if (PRINT_SUBTASK_EVENT){
     IsosDebugBasic_PrintFrontBlank();
-    if (subtaskCase > 0){
-      printf("Successful case, move to Subtask %d\n", subtaskDirectionNo);
-    } else if (subtaskCase == 0){
-      printf("Waiting resource to finish, stay in Subtask %d\n", subtaskDirectionNo);
+    if (subtaskDirectionNo > 0){
+      switch(subtaskCase){
+      case -2:
+        printf("Timeout case, move to Subtask %d\n", subtaskDirectionNo);
+        break;
+      case -1:
+        printf("Failed case, move to Subtask %d\n", subtaskDirectionNo);
+        break;
+      case 0:
+        printf("Waiting %sto finish, stay in Subtask %d\n", isResource ? "" : "resource ", subtaskDirectionNo);
+        break;
+      case 1:
+        printf("Successful case, move to Subtask %d\n", subtaskDirectionNo);
+        break;
+      }
     } else {
-      printf("Failed case, move to Subtask %d\n", subtaskDirectionNo);
+      switch(subtaskCase){
+      case -2:
+        printf("Timeout case, terminate the task\n");
+        break;
+      case -1:
+        printf("Failed case, terminate the task\n");
+        break;
+      case 0:
+        printf("Waiting %sto finish, terminate the task\n", isResource ? "" : "resource ");
+        break;
+      case 1:
+        printf("Successful case, terminate the task\n");
+        break;
+      }
     }
   }
 }
@@ -180,7 +281,7 @@ void IsosDebugBasic_PrintWaitingNote(const IsosTaskInfo* taskInfo){
   if (PRINT_SUBTASK_EVENT){
     IsosDebugBasic_PrintFrontBlank();
     printf("Task [%d] is [Suspended] until T:", taskInfo->Id);
-    IsosDebugBasic_PrintClock(&taskInfo->SuspensionDue);
+    IsosDebugBasic_PrintClock(&taskInfo->SuspensionInfo.Due);
     printf("\n");
   }
 }
@@ -190,4 +291,21 @@ void IsosDebugBasic_PrintEndWaitingNote(const IsosTaskInfo* taskInfo){
     printf("[Note]      : Task [%d] suspension time is over\n", taskInfo->Id);
 }
 
+void IsosDebugBasic_PrintForcedTimeoutDetected(const IsosTaskInfo* taskInfo){
+  char clockResults[13];
+  if(PRINT_OS_TIMEOUT_EVENT){
+    printf("[ISOS]      : Task [%d] has been running for too long!\n", taskInfo->Id);
+    IsosDebugBasic_PrintFrontBlank();
+    IsosDebugBasic_GetPrintClock(&taskInfo->LastExecuted, clockResults);
+    printf("Executed: T:%s, ", clockResults);
+    IsosDebugBasic_GetPrintClock(&taskInfo->Timeout, clockResults);
+    printf("Timeout: T:%s\n", clockResults);
+    IsosDebugBasic_PrintFrontBlank();
+    printf("Forcing Task [%d] to [Timeout]...\n", taskInfo->Id);
+  }
+}
 
+void IsosDebugBasic_PrintStuckTask(unsigned char taskId){
+  if (PRINT_OS_TIMEOUT_EVENT)
+    printf("[Note]      : Task [%d] is STUCK!\n", taskId);
+}

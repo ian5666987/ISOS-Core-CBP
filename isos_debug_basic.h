@@ -61,7 +61,10 @@ char* IsosDebugBasic_TaskTypeToString(IsosTaskType type);
 char* IsosDebugBasic_ResourceTypeToString(IsosResourceTaskType type);
 char* IsosDebugBasic_TaskStateToString(IsosTaskState state);
 void IsosDebugBasic_PrintFrontBlank();
+void IsosDebugBasic_PrintResourceTaskInvalid(IsosResourceTaskType type);
 void IsosDebugBasic_PrintResourceClaiming(IsosResourceTaskType type, char result, unsigned char id);
+void IsosDebugBasic_PrintBufferData(IsosBuffer* buffer);
+void IsosDebugBasic_PrintResourceTaskBufferData(IsosResourceTaskType type, IsosBuffer* buffer, char eventNo);
 void IsosDebugBasic_PrintResourceChecking(IsosResourceTaskType type, IsosTaskState state, unsigned char id);
 void IsosDebugBasic_PrintResourceReleasing(IsosResourceTaskType type, unsigned char id);
 void IsosDebugBasic_GetPrintClock(const IsosClock* clock, char* results);
@@ -69,8 +72,10 @@ void IsosDebugBasic_PrintClock(const IsosClock* clock);
 void IsosDebugBasic_PrintTaskInfo(const IsosTaskInfo* taskInfo);
 void IsosDebugBasic_PrintDueTasks(const IsosDueTask* dueTask, short dueSize);
 void IsosDebugBasic_PrintDueTasksEnding(short dueSize);
-void IsosDebugBasic_PrintSubtaskNote(char subtaskCase, short subtaskDirectionNo);
+void IsosDebugBasic_PrintSubtaskNote(char subtaskCase, short subtaskDirectionNo, char isResource);
 void IsosDebugBasic_PrintWaitingNote(const IsosTaskInfo* taskInfo);
 void IsosDebugBasic_PrintEndWaitingNote(const IsosTaskInfo* taskInfo);
+void IsosDebugBasic_PrintForcedTimeoutDetected(const IsosTaskInfo* taskInfo);
+void IsosDebugBasic_PrintStuckTask(unsigned char taskId);
 
 #endif

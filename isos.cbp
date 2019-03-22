@@ -37,6 +37,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="isos.h" />
+		<Unit filename="isos_buffer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="isos_buffer.h" />
 		<Unit filename="isos_clock.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -53,6 +57,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="isos_task.h" />
+		<Unit filename="isos_utilities.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="isos_utilities.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
