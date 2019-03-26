@@ -82,9 +82,9 @@ int main() {
 }
 
 void registerTasks(){
-  Isos_RegisterRunOnceTask(1, 0, 500, 0, 0, 40, RunOnceTask1); //suppose this is antenna deployment
-  Isos_RegisterRunOnceTask(1, 0, 800, 0, 0, 45, RunOnceTask2); //suppose this is solar panel deployment
-  Isos_RegisterRunOnceTask(1, 0, 370, 0, 0, 5, RunOnceTask3); //purposely made to simulate interesting clash on 370ms time stamp
+  Isos_RegisterNonCyclicalTask(1, 0, 500, 0, 0, 40, NonCyclicalTask1); //suppose this is antenna deployment
+  Isos_RegisterNonCyclicalTask(1, 0, 800, 0, 0, 45, NonCyclicalTask2); //suppose this is solar panel deployment
+  Isos_RegisterNonCyclicalTask(1, 0, 370, 0, 0, 5, NonCyclicalTask3); //purposely made to simulate interesting clash on 370ms time stamp
   Isos_RegisterLooselyRepeatedTask(1, 0, 100, 0, 0, 0, LooselyRepeatedTask1);
   Isos_RegisterLooselyRepeatedTask(1, 0, 150, 0, 0, 1, LooselyRepeatedTask2);
   Isos_RegisterLooselyRepeatedTask(1, 0, 400, 0, 0, 2, LooselyRepeatedTask3); //Added to test task waiting case
@@ -262,15 +262,15 @@ void simulateGettingRxData(IsosResourceTaskType type, int rxSize){
   }
 }
 
-void RunOnceTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+void NonCyclicalTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
   simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1);
 }
 
-void RunOnceTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+void NonCyclicalTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
   simulateCommonTaskWithMultiResourcesUsage(taskId, taskActionInfo, IsosResourceTaskType_Type1, IsosResourceTaskType_Type2);
 }
 
-void RunOnceTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
+void NonCyclicalTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo){
   simulateCommonTaskWithResourceUsage(taskId, taskActionInfo, IsosResourceTaskType_Type2);
 }
 

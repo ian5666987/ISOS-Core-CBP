@@ -74,7 +74,7 @@ short Isos_GetTaskSize();
 void Isos_SetTaskTimeout(unsigned char taskId, short timeoutDay, long timeoutMs);
 
 //Task registration
-char Isos_RegisterRunOnceTask(char enabled, short executionDueDay, long executionDueMs, short timeoutDay, long timeoutMs,
+char Isos_RegisterNonCyclicalTask(char enabled, short executionDueDay, long executionDueMs, short timeoutDay, long timeoutMs,
                               unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*));
 char Isos_RegisterResourceTaskWithBuffers(IsosResourceTaskType resourceType, short timeoutDay, long timeoutMs,
                                           unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*),
@@ -92,8 +92,8 @@ char Isos_RegisterPeriodicTask(char enabled, short periodDay, long periodMs, sho
                                unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*));
 
 //Tasks scheduling and execution functions
-void Isos_ScheduleRunOnceTask(IsosTaskInfo* taskInfo, unsigned char priority, char withReset, short executionDueDay, long executionDueMs);
-void Isos_DueNonCyclicalTaskNow(IsosTaskInfo* taskInfo, unsigned char priority, char withReset);
+void Isos_ScheduleNonCyclicalTask(IsosTaskInfo* taskInfo, unsigned char priority, char withReset, short executionDueDay, long executionDueMs);
+void Isos_DueNonCyclicalOrResourceTaskNow(IsosTaskInfo* taskInfo, unsigned char priority, char withReset);
 void Isos_DueTaskNow(IsosTaskInfo* taskInfo, unsigned char priority, char withReset);
 void Isos_Run();
 void Isos_Wait(unsigned char taskId, short waitingDay, long waitingMs);

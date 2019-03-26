@@ -46,7 +46,7 @@ extern unsigned char NullBuffer[0];
 
 char* IsosDebugBasic_TaskTypeToString(IsosTaskType type){
   switch(type){
-    case IsosTaskType_RunOnce: return "NC-RO";
+    case IsosTaskType_NonCyclical: return "NC-RO";
     case IsosTaskType_Resource: return "NC-RS";
     case IsosTaskType_LooselyRepeated: return "CY-LR";
     case IsosTaskType_Repeated: return "CY-RE";

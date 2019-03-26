@@ -54,7 +54,7 @@
 
 typedef enum IsosTaskTypeEnum {
   //Non-cyclical
-  IsosTaskType_RunOnce,  //used for task needs to be run only once
+  IsosTaskType_NonCyclical,  //used for task needs to be run only once
   IsosTaskType_Resource, //used to mark resource task type, otherwise actually very similar to run once
 
   //Cyclical

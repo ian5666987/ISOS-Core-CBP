@@ -47,9 +47,9 @@
 
 void registerTasks();
 
-void RunOnceTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
-void RunOnceTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
-void RunOnceTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test lower priority resource task claimer at T:370ms
+void NonCyclicalTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void NonCyclicalTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
+void NonCyclicalTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test lower priority resource task claimer at T:370ms
 void LooselyRepeatedTask1(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
 void LooselyRepeatedTask2(unsigned char taskId, IsosTaskActionInfo* taskActionInfo);
 void LooselyRepeatedTask3(unsigned char taskId, IsosTaskActionInfo* taskActionInfo); //test task with suspension

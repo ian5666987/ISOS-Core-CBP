@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1553258464 source:c:\astrio\c\isos\isos\main.c
+1553349541 source:c:\astrio\c\isos\isos\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -9,23 +9,23 @@
 	"isos_debug_basic.h"
 	"isos_utilities.h"
 
-1553249218 source:c:\astrio\c\isos\isos\isos_task.c
+1553344215 source:c:\astrio\c\isos\isos\isos_task.c
 	<stdio.h>
 	<string.h>
 	"isos_task.h"
 
-1553242785 c:\astrio\c\isos\isos\isos_task.h
+1553343314 c:\astrio\c\isos\isos\isos_task.h
 	"isos_clock.h"
 	"isos_buffer.h"
 
-1553256786 source:c:\astrio\c\isos\isos\isos.c
+1553344212 source:c:\astrio\c\isos\isos\isos.c
 	<stdio.h>
 	<string.h>
 	"isos.h"
 	"isos_quicksort.h"
 	"isos_debug_basic.h"
 
-1553257034 c:\astrio\c\isos\isos\isos.h
+1553608633 c:\astrio\c\isos\isos\isos.h
 	"isos_task.h"
 	"isos_buffer.h"
 
@@ -48,7 +48,7 @@
 
 1552979385 c:\astrio\c\isos\isos\isos_quicksort.h
 
-1553258299 source:c:\astrio\c\isos\isos\isos_debug_basic.c
+1553344214 source:c:\astrio\c\isos\isos\isos_debug_basic.c
 	<string.h>
 	<stdio.h>
 	"isos_debug_basic.h"

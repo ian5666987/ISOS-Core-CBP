@@ -305,8 +305,8 @@ void Isos_execute(IsosTask* task){
     taskInfo->IsDueReported = 0; //now the flag is set down so that we can know that this can be reported again
     taskInfo->ForcedDue = 0; //whatever happen, reset the force due now flag here
     taskInfo->LastFinished = Isos_GetClock(); //update the last time task is finished executed
-    if (taskInfo->Type == IsosTaskType_Resource || taskInfo->Type == IsosTaskType_RunOnce)
-      taskActionInfo->Enabled = 0; //resource task and runOnce tasks are always disabled after completed to prevent them to be re-run
+    if (taskInfo->Type == IsosTaskType_Resource || taskInfo->Type == IsosTaskType_NonCyclical)
+      taskActionInfo->Enabled = 0; //resource task and NonCyclical tasks are always disabled after completed to prevent them to be re-run
 
     //special case for timeout! AT MOST, there could only be ONE claimed resource task per task at any given time
     //WARNING: remember this MUST BE DONE THE LAST BUT BEFORE the DEQUEUEING
@@ -357,9 +357,9 @@ char Isos_registerTask(IsosTaskType type, IsosResourceTaskType resourceType, cha
   return 1; //successful
 }
 
-char Isos_RegisterRunOnceTask(char enabled, short executionDueDay, long executionDueMs, short timeoutDay, long timeoutMs,
-                              unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*)){
-  return Isos_registerTask(IsosTaskType_RunOnce, IsosResourceTaskType_Unspecified, enabled, executionDueDay, executionDueMs,
+char Isos_RegisterNonCyclicalTask(char enabled, short executionDueDay, long executionDueMs, short timeoutDay, long timeoutMs,
+                                  unsigned char priority, void (*taskAction)(unsigned char, IsosTaskActionInfo*)){
+  return Isos_registerTask(IsosTaskType_NonCyclical, IsosResourceTaskType_Unspecified, enabled, executionDueDay, executionDueMs,
                            timeoutDay, timeoutMs, priority, taskAction,
                            NullBuffer, 0, NullBuffer, 0);
 }
@@ -409,19 +409,19 @@ char Isos_RegisterPeriodicTask(char enabled, short periodDay, long periodMs, sho
                            NullBuffer, 0, NullBuffer, 0);
 }
 
-//Function to schedule a RunOnce task to be run sometime in the future with specified priority
-void Isos_ScheduleRunOnceTask(IsosTaskInfo* taskInfo, unsigned char priority, char withReset, short executionDueDay, long executionDueMs){
+//Function to schedule a NonCyclical task to be run sometime in the future with specified priority
+void Isos_ScheduleNonCyclicalTask(IsosTaskInfo* taskInfo, unsigned char priority, char withReset, short executionDueDay, long executionDueMs){
   IsosClock clock;
-  if (taskInfo->Type != IsosTaskType_RunOnce)
+  if (taskInfo->Type != IsosTaskType_NonCyclical)
     return; //rejects to run cyclical task type
   clock.Day = executionDueDay;
   clock.Ms = executionDueMs;
   Isos_commonPrepareDueNonCyclicalTask(taskInfo, priority, withReset, clock);
 }
 
-//Function to hasten the due of a non-cyclical (RunOnce or Resource) task to be run immediately with specified priority
-void Isos_DueNonCyclicalTaskNow(IsosTaskInfo* taskInfo, unsigned char priority, char withReset){
-  if (taskInfo->Type != IsosTaskType_RunOnce && taskInfo->Type != IsosTaskType_Resource)
+//Function to hasten the due of a non-cyclical (NonCyclical or Resource) task to be run immediately with specified priority
+void Isos_DueNonCyclicalOrResourceTaskNow(IsosTaskInfo* taskInfo, unsigned char priority, char withReset){
+  if (taskInfo->Type != IsosTaskType_NonCyclical && taskInfo->Type != IsosTaskType_Resource)
     return; //rejects to run cyclical task type
   Isos_commonPrepareDueNonCyclicalTask(taskInfo, priority, withReset, Isos_GetClock());
 }
@@ -481,7 +481,6 @@ void Isos_Run(){
   static IsosClock measuredClock, clock;
   static short initialDueTaskSize, i;
   static IsosDueTask* dueTask;
-  unsigned char currentDueTaskId;
   measuredClock = Isos_GetClock(); //the very first measured clock right now
   clock = IsosClock_Minus(&measuredClock, &LastSchedulerRun); //the difference between the clock now with the last time the scheduler runs
   clock = IsosClock_Minus(&clock, &SchedulerPeriod); //check if the difference computed above surpasses the scheduler period
@@ -496,8 +495,7 @@ void Isos_Run(){
   #endif // BASIC_DEBUG
   for (i = initialDueTaskSize - 1; i >= 0; --i){
     dueTask = &IsosDueTaskList[i];
-    currentDueTaskId = dueTask->TaskId;
-    Isos_execute(&IsosTaskList[currentDueTaskId]);
+    Isos_execute(&IsosTaskList[dueTask->TaskId]);
     Isos_handleLastReleasedResource(&i);
     Isos_handleLastClaimedResource(&i);
   }
