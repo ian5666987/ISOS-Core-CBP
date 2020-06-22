@@ -79,7 +79,7 @@ IsosClock IsosClock_Minus(const IsosClock *clock, const IsosClock *minusClock){
 }
 
 //The input is an adjusted clock
-char IsosClock_GetDirection(const IsosClock *adjustedClock){
+int IsosClock_GetDirection(const IsosClock *adjustedClock){
   if(adjustedClock->Day == 0 && adjustedClock->Ms == 0)
     return 0; //this is neutral clock direction
   if(adjustedClock->Day > 0)

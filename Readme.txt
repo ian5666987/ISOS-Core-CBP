@@ -4,6 +4,7 @@ Inspire Satellite Operating System (ISOS) is an (1) easy-to-understand, (2) easy
    - Uses simple, straight forward, yet efficient C programming style
    - Does not use stack pointers manipulation at all, so it is fully compatible with any code optimizers
    - Very clear naming of the files, variables, and functions - leaving little rooms for guessing what they stand for
+   - Configurable task behaviors (based on task cyclical/non-cyclical types) and structures
    - No convoluted/fanciful-looking macros, code, etc, just pure, simple C
    - No deeply-nested/recursive code for everything (quick_sort algorithm excepted), making it very easy to read, even for beginner C coder
    - Uses (i) simple switch case and (ii) concept of subtask, instead of stack pointers manipulation to control segmentation of the tasks in a task function

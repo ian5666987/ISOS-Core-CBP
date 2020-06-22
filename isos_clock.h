@@ -48,6 +48,6 @@ IsosClock IsosClock_Create(short day, long ms);
 void IsosClock_Adjust(IsosClock *clock);
 IsosClock IsosClock_Add(const IsosClock *clock, const IsosClock *addClock);
 IsosClock IsosClock_Minus(const IsosClock *clock, const IsosClock *minusClock);
-char IsosClock_GetDirection(const IsosClock *adjustedClock);
+int IsosClock_GetDirection(const IsosClock *adjustedClock);
 
 #endif
